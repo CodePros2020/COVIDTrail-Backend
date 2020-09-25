@@ -1,6 +1,7 @@
 package com.covidtrail.covidtrailbackend.repository;
 
 import com.covidtrail.covidtrailbackend.model.UserAccount;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,16 +21,40 @@ public class UserAccountService {
      *
      * @return list of user accounts
      */
-    public List<UserAccount> getUserAccountById() {
+    public List<UserAccount> getAllUserAccounts() {
         String sql = "" +
-                "SELECT * " +
+                "SELECT DISTINCT * " +
                 "FROM UserAccount " +
                 "ORDER BY ID DESC";
 
         Query query = manager.createNativeQuery(sql);
 
         return (List<UserAccount>) query.getResultList().stream()
-                .map(x -> mapToUserAccount(x)).collect(Collectors.toList());
+                .map(this::mapToUserAccount).collect(Collectors.toList());
+    }
+
+    /**
+     * Get user account by id
+     *
+     * @return user account
+     */
+    public UserAccount getUserAccount(int id) throws Exception {
+        if (id == 0) {
+            throw new NotFoundException("Id is required");
+        }
+
+        String sql = "" +
+                "SELECT DISTINCT * " +
+                "FROM UserAccount " +
+                "WHERE ID = :id" +
+                "ORDER BY ID DESC";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("id", id);
+
+        return (UserAccount) query.getResultList().stream()
+                .map(this::mapToUserAccount).collect(Collectors.toList());
     }
 
     /**

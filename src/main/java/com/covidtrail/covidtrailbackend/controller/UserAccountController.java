@@ -25,7 +25,7 @@ public class UserAccountController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public List<UserAccount> getUserAccounts() {
-        return userAccountService.getUserAccountById();
+        return userAccountService.getAllUserAccounts();
     }
 
     @GetMapping("/{id}")
@@ -34,8 +34,8 @@ public class UserAccountController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccount getUserAccountById() {
-        return null;
+    public UserAccount getUserAccountById(@PathVariable int id) throws Exception {
+        return userAccountService.getUserAccount(id);
     }
 
     @PostMapping("/")
