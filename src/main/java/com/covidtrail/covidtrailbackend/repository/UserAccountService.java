@@ -15,6 +15,11 @@ public class UserAccountService {
     @Autowired
     protected EntityManager manager;
 
+    /**
+     * Get the list of all user accounts
+     *
+     * @return list of user accounts
+     */
     public List<UserAccount> getUserAccountById() {
         String sql = "" +
                 "SELECT * " +
@@ -27,6 +32,12 @@ public class UserAccountService {
                 .map(x -> mapToUserAccount(x)).collect(Collectors.toList());
     }
 
+    /**
+     * Map object to User Account Object
+     *
+     * @param obj - Object
+     * @return User Account
+     */
     public UserAccount mapToUserAccount(Object obj) {
         Object[] val = (Object[]) obj;
         UserAccount userAccount = new UserAccount();
