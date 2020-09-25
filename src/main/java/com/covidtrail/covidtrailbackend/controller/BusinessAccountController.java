@@ -1,7 +1,8 @@
 package com.covidtrail.covidtrailbackend.controller;
 
+import com.covidtrail.covidtrailbackend.model.BusinessAccount;
 import com.covidtrail.covidtrailbackend.model.UserAccount;
-import com.covidtrail.covidtrailbackend.repository.UserAccountService;
+import com.covidtrail.covidtrailbackend.repository.BusinessAccountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -12,30 +13,32 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/userAccount")
-@Api(tags = { "User Account" })
-public class UserAccountController {
+@RequestMapping("/api/businessAccount")
+@Api(tags = { "Business Account" })
+public class BusinessAccountController {
     @Autowired
-    protected UserAccountService userAccountService;
+    protected BusinessAccountService businessAccountService;
 
     @GetMapping("/")
-    @ApiOperation(value = "Get a list of all user accounts.")
+    @ApiOperation(value = "Get a list of all business accounts.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public List<UserAccount> getAllUserAccounts() throws Exception {
-        return userAccountService.getAllUserAccounts();
+    public List<BusinessAccount> getAllBusinessAccounts() throws Exception {
+        // TODO
+        return null;
     }
 
     @GetMapping("/{id}")
-    @ApiOperation(value = "Get an user account by id.")
+    @ApiOperation(value = "Get an business account by id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccount getUserAccountById(@PathVariable int id) throws Exception {
-        return userAccountService.getUserAccount(id);
+    public BusinessAccount getBusinessAccountById(@PathVariable int id) throws Exception {
+        // TODO
+        return null;
     }
 
     @PostMapping("/")
@@ -44,29 +47,29 @@ public class UserAccountController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccount createUserAccount(@RequestBody UserAccount userAccount) throws Exception {
+    public BusinessAccount createUserAccount(@RequestBody BusinessAccount userAccount) throws Exception {
         // TODO
         return null;
     }
 
     @PutMapping("/{id}")
-    @ApiOperation(value = "Update an user account with id.")
+    @ApiOperation(value = "Update a business account with id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccount updateUserAccount(@RequestBody UserAccount userAccount) throws Exception {
+    public BusinessAccount updateUserAccount(@RequestBody BusinessAccount userAccount) throws Exception {
         // TODO
         return null;
     }
 
     @DeleteMapping("/{id}")
-    @ApiOperation(value = "Delete an user account by id.")
+    @ApiOperation(value = "Delete an business account by id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccount deleteUserAccountById(@PathVariable int id) throws Exception {
+    public BusinessAccount deleteBusinessAccountById(@PathVariable int id) throws Exception {
         return null;
     }
 }
