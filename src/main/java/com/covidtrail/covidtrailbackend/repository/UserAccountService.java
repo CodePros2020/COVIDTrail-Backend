@@ -1,6 +1,7 @@
 package com.covidtrail.covidtrailbackend.repository;
 
 import com.covidtrail.covidtrailbackend.model.UserAccount;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,19 +16,56 @@ public class UserAccountService {
     @Autowired
     protected EntityManager manager;
 
-    public List<UserAccount> getUserAccountById() {
+    /**
+     * Get the list of all user accounts
+     *
+     * @return list of user accounts
+     */
+    public List<UserAccount> getAllUserAccounts() {
         String sql = "" +
-                "SELECT * " +
+                "SELECT DISTINCT * " +
                 "FROM UserAccount " +
-                "ORDER BY ID DESC";
+                "WHERE DELETED = 0 " +
+                "ORDER BY ID DESC ";
 
         Query query = manager.createNativeQuery(sql);
 
         return (List<UserAccount>) query.getResultList().stream()
-                .map(x -> mapToUserAccount(x)).collect(Collectors.toList());
+                .map(this::mapToUserAccount).collect(Collectors.toList());
     }
 
-    public UserAccount mapToUserAccount(Object obj) {
+    /**
+     * Get user account by id
+     *
+     * @return user account
+     */
+    public UserAccount getUserAccount(int id) throws Exception {
+        if (id == 0) {
+            throw new NotFoundException("Id is required");
+        }
+
+        String sql = "" +
+                "SELECT DISTINCT * " +
+                "FROM UserAccount " +
+                "WHERE ID = :id " +
+                "    AND DELETED = 0" +
+                "ORDER BY ID DESC";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("id", id);
+
+        return (UserAccount) query.getResultList().stream()
+                .map(this::mapToUserAccount).collect(Collectors.toList());
+    }
+
+    /**
+     * Map object to User Account Object
+     *
+     * @param obj - Object
+     * @return User Account
+     */
+    private UserAccount mapToUserAccount(Object obj) {
         Object[] val = (Object[]) obj;
         UserAccount userAccount = new UserAccount();
 
