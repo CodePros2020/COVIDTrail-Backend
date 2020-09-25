@@ -25,7 +25,8 @@ public class UserAccountService {
         String sql = "" +
                 "SELECT DISTINCT * " +
                 "FROM UserAccount " +
-                "ORDER BY ID DESC";
+                "WHERE DELETED = 0 " +
+                "ORDER BY ID DESC ";
 
         Query query = manager.createNativeQuery(sql);
 
@@ -46,7 +47,8 @@ public class UserAccountService {
         String sql = "" +
                 "SELECT DISTINCT * " +
                 "FROM UserAccount " +
-                "WHERE ID = :id" +
+                "WHERE ID = :id " +
+                "    AND DELETED = 0" +
                 "ORDER BY ID DESC";
 
         Query query = manager.createNativeQuery(sql);
