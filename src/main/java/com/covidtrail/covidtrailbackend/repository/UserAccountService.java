@@ -63,7 +63,7 @@ public class UserAccountService {
      * @param obj - Object
      * @return User Account
      */
-    public UserAccount mapToUserAccount(Object obj) {
+    private UserAccount mapToUserAccount(Object obj) {
         Object[] val = (Object[]) obj;
         UserAccount userAccount = new UserAccount();
 
