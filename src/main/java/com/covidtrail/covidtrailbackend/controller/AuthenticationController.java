@@ -1,6 +1,5 @@
 package com.covidtrail.covidtrailbackend.controller;
 
-import com.covidtrail.covidtrailbackend.dto.AccountDetailsDto;
 import com.covidtrail.covidtrailbackend.dto.LoginDto;
 import com.covidtrail.covidtrailbackend.repository.AuthenticationService;
 import io.swagger.annotations.Api;
@@ -25,7 +24,7 @@ public class AuthenticationController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public AccountDetailsDto login(@RequestBody LoginDto loginDto) throws Exception {
+    public PlacesVisitedLogCreateDto login(@RequestBody LoginDto loginDto) throws Exception {
         // TODO
         return null;
     }

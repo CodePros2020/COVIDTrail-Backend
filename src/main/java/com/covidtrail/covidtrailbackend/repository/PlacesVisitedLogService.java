@@ -1,7 +1,9 @@
 package com.covidtrail.covidtrailbackend.repository;
 
+import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
 import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogDto;
 import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -119,7 +121,40 @@ public class PlacesVisitedLogService {
     }
 
     /**
-     * Map object to Business Account Object
+     * Create a new places visited log
+     *
+     * @param userId     - user account id
+     * @param businessId - business account id
+     * @return string message
+     */
+    public String createPlacesVisitedLog(int userId, int businessId) throws Exception {
+        UserAccountDto userAccount = userAccountService.getUserAccountById(userId);
+        BusinessAccountDto businessAccount = businessAccountService.getBusinessAccountById(businessId);
+
+        if (userAccount == null) {
+            throw new NotFoundException("User account not found with the id " + userId);
+        }
+
+        if (businessAccount == null) {
+            throw new NotFoundException("Business account not found with the id " + businessId);
+        }
+
+        String sql = "" +
+                " INSERT INTO PLACESVISITEDLOG (CREATED_DATETIME, LAST_MODIFIED_DATETIME, DELETED, VISITED_DATETIME, USERACCOUNT_ID, BUSINESSACCOUNT_ID)" +
+                " VALUES (GETDATE(), GETDATE(), 0, GETDATE(), :userId, :businessId)";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("userId", userId);
+        query.setParameter("businessId", businessId);
+
+        query.executeUpdate();
+
+        return String.format("Places visit log has been successfully created between user %d and business %d.", userId, businessId);
+    }
+
+    /**
+     * Map object to Places Visited Log Object
      *
      * @param obj - Object
      * @return Business Account

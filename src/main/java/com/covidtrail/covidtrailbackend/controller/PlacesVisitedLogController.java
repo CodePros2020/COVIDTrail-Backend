@@ -1,7 +1,6 @@
 package com.covidtrail.covidtrailbackend.controller;
 
 import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogDto;
-import com.covidtrail.covidtrailbackend.model.BusinessAccount;
 import com.covidtrail.covidtrailbackend.repository.PlacesVisitedLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/placesVisitedLog")
-@Api(tags = { "Places Visited Log" })
+@Api(tags = {"Places Visited Log"})
 public class PlacesVisitedLogController {
     @Autowired
     protected PlacesVisitedLogService placesVisitedLogService;
@@ -24,7 +23,7 @@ public class PlacesVisitedLogController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public List<PlacesVisitedLogDto> getAllPlacesVisitedLogs() throws Exception {
+    public List<PlacesVisitedLogDto> getAllPlacesVisitedLogs() {
         return placesVisitedLogService.getAllPlacesVisitedLogs();
     }
 
@@ -42,7 +41,7 @@ public class PlacesVisitedLogController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public List<PlacesVisitedLogDto> getPlacesVisitedLogsByUserId(@PathVariable int userId) throws Exception {
+    public List<PlacesVisitedLogDto> getPlacesVisitedLogsByUserId(@PathVariable int userId) {
         return placesVisitedLogService.getPlacesVisitedLogsByUserId(userId);
     }
 
@@ -51,7 +50,7 @@ public class PlacesVisitedLogController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public List<PlacesVisitedLogDto> getPlacesVisitedLogsByBusinessId(@PathVariable int businessId) throws Exception {
+    public List<PlacesVisitedLogDto> getPlacesVisitedLogsByBusinessId(@PathVariable int businessId) {
         return placesVisitedLogService.getPlacesVisitedLogsByBusinessId(businessId);
     }
 
@@ -60,8 +59,11 @@ public class PlacesVisitedLogController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public String createPlacesVisitedLog(@RequestBody BusinessAccount userAccount) throws Exception {
-        // TODO
-        return null;
+    public String createPlacesVisitedLog(@RequestParam int userId, @RequestParam int businessId) throws Exception {
+        try {
+            return placesVisitedLogService.createPlacesVisitedLog(userId, businessId);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 }
