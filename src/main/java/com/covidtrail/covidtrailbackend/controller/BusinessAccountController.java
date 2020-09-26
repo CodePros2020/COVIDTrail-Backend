@@ -33,8 +33,8 @@ public class BusinessAccountController {
 
     @Autowired
     protected SessionInfo sessionInfo;
-    
-    @GetMapping("/")
+
+    @GetMapping()
     @ApiOperation(value = "Get a list of all business accounts.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -56,7 +56,7 @@ public class BusinessAccountController {
         return businessAccountService.getBusinessAccountById(id);
     }
 
-    @PostMapping("/")
+    @PostMapping()
     @ApiOperation(value = "Create a new business account.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
