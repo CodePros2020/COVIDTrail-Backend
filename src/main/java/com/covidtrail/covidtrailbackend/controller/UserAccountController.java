@@ -1,17 +1,27 @@
 package com.covidtrail.covidtrailbackend.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.covidtrail.covidtrailbackend.dto.UserAccountCreateDto;
 import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
 import com.covidtrail.covidtrailbackend.dto.UserAccountNameUpdateDto;
-import com.covidtrail.covidtrailbackend.model.UserAccount;
 import com.covidtrail.covidtrailbackend.repository.UserAccountService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/userAccount")
@@ -39,13 +49,12 @@ public class UserAccountController {
     }
 
     @PostMapping("/")
-    @ApiOperation(value = "Create a new business account.")
+    @ApiOperation(value = "Create a new user account.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccountDto createUserAccount(@RequestBody UserAccount userAccount) throws Exception {
-        // TODO
-        return null;
+    public UserAccountDto createUserAccount(@RequestBody UserAccountCreateDto dto) throws Exception {
+    	return userAccountService.createUserAccount(dto);
     }
 
     @PutMapping("/{id}/name")
