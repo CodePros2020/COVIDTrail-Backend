@@ -1,23 +1,55 @@
 package com.covidtrail.covidtrailbackend.config;
 
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@EnableTransactionManagement
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	
+	@Autowired
+    private DataSource dataSource;
+     
+    @Autowired
+    public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
+        auth.jdbcAuthentication().passwordEncoder(new BCryptPasswordEncoder())
+            .dataSource(dataSource)
+            .usersByUsernameQuery("select username, password, enabled from useraccount where username=?")
+            .authoritiesByUsernameQuery("select username, role from useraccount where username=?")
+        ;
+    }
+	
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+    	
+    	String[] noAuthPaths = {
+				"/swagger-ui.html",
+				"/v2/api-docs",
+				"/configuration/ui/**",
+				"/swagger-resources/**",
+				"/configuration/security/**",
+				"/swagger-ui.html",
+           	 	"/webjars/**"};
+    	
         http.cors();
-        http.csrf().disable();
-        // Swagger
-        http.authorizeRequests().antMatchers("/swagger-ui.html*").permitAll();
-        // Stateless session strategy
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.csrf().disable()
+
+        .authorizeRequests()
+		.antMatchers(noAuthPaths).permitAll()
+        .and()
+        	.authorizeRequests()
+        	.anyRequest().authenticated()
+        .and()
+            .formLogin().permitAll()
+        .and()
+        	.logout().permitAll();
     }
+    
 }
