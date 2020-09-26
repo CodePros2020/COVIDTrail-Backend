@@ -1,5 +1,6 @@
 package com.covidtrail.covidtrailbackend.repository;
 
+import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
 import com.covidtrail.covidtrailbackend.model.UserAccount;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.util.Date;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,22 +17,32 @@ public class UserAccountService {
     @Autowired
     protected EntityManager manager;
 
+    @Autowired
+    protected AddressService addressService;
+
     /**
      * Get the list of all user accounts
      *
      * @return list of user accounts
      */
-    public List<UserAccount> getAllUserAccounts() {
+    public List<UserAccountDto> getAllUserAccounts() {
         String sql = "" +
-                " SELECT DISTINCT *" +
+                " SELECT DISTINCT" +
+                "     ID," +
+                "     FIRSTNAME," +
+                "     MIDDLENAME," +
+                "     LASTNAME," +
+                "     EMAIL," +
+                "     PHONE," +
+                "     ADDRESS_ID" +
                 " FROM USERACCOUNT" +
                 " WHERE DELETED = 0" +
                 " ORDER BY ID DESC";
 
         Query query = manager.createNativeQuery(sql);
 
-        return (List<UserAccount>) query.getResultList().stream()
-                .map(this::mapToUserAccount).collect(Collectors.toList());
+        return (List<UserAccountDto>) query.getResultList().stream()
+                .map(this::mapToUserAccountDto).collect(Collectors.toList());
     }
 
     /**
@@ -40,13 +51,20 @@ public class UserAccountService {
      * @return user account
      * @throws Exception when id not found
      */
-    public UserAccount getUserAccountById(int id) throws Exception {
+    public UserAccountDto getUserAccountById(int id) throws Exception {
         if (id == 0) {
             throw new NotFoundException("Id is required");
         }
 
         String sql = "" +
-                " SELECT DISTINCT *" +
+                " SELECT DISTINCT " +
+                "     ID," +
+                "     FIRSTNAME," +
+                "     MIDDLENAME," +
+                "     LASTNAME," +
+                "     EMAIL," +
+                "     PHONE," +
+                "     ADDRESS_ID" +
                 " FROM USERACCOUNT" +
                 " WHERE ID = :id" +
                 "     AND DELETED = 0" +
@@ -56,8 +74,17 @@ public class UserAccountService {
 
         query.setParameter("id", id);
 
-        return (UserAccount) query.getResultList().stream()
-                .map(this::mapToUserAccount).collect(Collectors.toList());
+        return mapToUserAccountDto(query.getSingleResult());
+
+//        return (UserAccountDto) query.getResultList().stream()
+//                .map(x -> {
+//                    try {
+//                        return mapToUserAccountDto(x);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                    return x;
+//                }).collect(Collectors.toList());
     }
 
     /**
@@ -65,14 +92,15 @@ public class UserAccountService {
      *
      * @param id - user account id
      * @return string message
-     * @throws Exception when id not found or user acoount not found
+     * @throws Exception when id not found or user account not found
      */
+    @Transactional
     public String deleteUserAccountById(int id) throws Exception {
         if (id == 0) {
             throw new NotFoundException("Id is required");
         }
 
-        UserAccount userAccount = getUserAccountById(id);
+        UserAccountDto userAccount = getUserAccountById(id);
 
         if (userAccount == null) {
             throw new NotFoundException("User account not found with the id " + id);
@@ -89,7 +117,7 @@ public class UserAccountService {
 
         query.setParameter("id", id);
 
-        query.getResultList();
+        query.executeUpdate();
 
         return String.format("User %s %s with id %d deleted successfully.", userAccount.getFirstName(), userAccount.getLastName(), id);
     }
@@ -100,26 +128,17 @@ public class UserAccountService {
      * @param obj - Object
      * @return User Account
      */
-    private UserAccount mapToUserAccount(Object obj) {
+    private UserAccountDto mapToUserAccountDto(Object obj) {
         Object[] val = (Object[]) obj;
-        UserAccount userAccount = new UserAccount();
+        UserAccountDto userAccount = new UserAccountDto();
 
         userAccount.setId(Integer.parseInt(val[0].toString()));
-        userAccount.setCreatedDate((Date) val[1]);
-        userAccount.setLastModifiedDateTime((Date) val[2]);
-        userAccount.setDeletedDateTime((Date) val[3]);
-        userAccount.setDeleted(Integer.parseInt(val[4].toString()));
-        userAccount.setFirstName((String) val[5]);
-        userAccount.setMiddleName((String) val[6]);
-        userAccount.setLastName((String) val[7]);
-        userAccount.setAddressLineOne((String) val[8]);
-        userAccount.setAddressLineTwo((String) val[9]);
-        userAccount.setCity((String) val[10]);
-        userAccount.setProvince((String) val[11]);
-        userAccount.setPostalCode((String) val[12]);
-        userAccount.setEmail((String) val[13]);
-        userAccount.setPhone((String) val[14]);
-        userAccount.setPassword((String) val[15]);
+        userAccount.setFirstName((String) val[1]);
+        userAccount.setMiddleName((String) val[2]);
+        userAccount.setLastName((String) val[3]);
+        userAccount.setEmail((String) val[4]);
+        userAccount.setPhone((String) val[5]);
+        userAccount.setAddress(addressService.getAddressById(Integer.parseInt(String.valueOf(val[6]))));
 
         return userAccount;
     }

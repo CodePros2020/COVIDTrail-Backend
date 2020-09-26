@@ -1,5 +1,6 @@
 package com.covidtrail.covidtrailbackend.controller;
 
+import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
 import com.covidtrail.covidtrailbackend.model.BusinessAccount;
 import com.covidtrail.covidtrailbackend.model.UserAccount;
 import com.covidtrail.covidtrailbackend.repository.BusinessAccountService;
@@ -25,7 +26,7 @@ public class BusinessAccountController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public List<BusinessAccount> getAllBusinessAccounts() throws Exception {
+    public List<BusinessAccountDto> getAllBusinessAccounts() throws Exception {
         return businessAccountService.getAllBusinessAccounts();
     }
 
@@ -35,7 +36,7 @@ public class BusinessAccountController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public BusinessAccount getBusinessAccountById(@PathVariable int id) throws Exception {
+    public BusinessAccountDto getBusinessAccountById(@PathVariable int id) throws Exception {
         return businessAccountService.getBusinessAccountById(id);
     }
 
@@ -45,7 +46,7 @@ public class BusinessAccountController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public BusinessAccount createUserAccount(@RequestBody BusinessAccount userAccount) throws Exception {
+    public BusinessAccountDto createUserAccount(@RequestBody BusinessAccount userAccount) throws Exception {
         // TODO
         return null;
     }
@@ -56,7 +57,7 @@ public class BusinessAccountController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public BusinessAccount updateUserAccount(@RequestBody BusinessAccount userAccount) throws Exception {
+    public BusinessAccountDto updateUserAccount(@RequestBody BusinessAccount userAccount) throws Exception {
         // TODO
         return null;
     }
@@ -67,8 +68,7 @@ public class BusinessAccountController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public BusinessAccount deleteBusinessAccountById(@PathVariable int id) throws Exception {
-        // TODO
-        return null;
+    public String deleteBusinessAccountById(@PathVariable int id) throws Exception {
+        return businessAccountService.deleteBusinessAccountById(id);
     }
 }

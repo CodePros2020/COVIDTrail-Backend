@@ -9,15 +9,15 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BusinessAccount {
+public class Address {
     private int id;
     private Date createdDate;
     private Date lastModifiedDateTime;
     private Date deletedDateTime;
     private int deleted;
-    private String businessName;
-    private int addressId;
-    private String email;
-    private String phone;
-    private String password;
+    private String addressLineOne;
+    private String addressLineTwo;
+    private String city;
+    private String province;
+    private String postalCode;
 }

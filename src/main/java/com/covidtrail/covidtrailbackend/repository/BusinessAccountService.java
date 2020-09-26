@@ -1,12 +1,15 @@
 package com.covidtrail.covidtrailbackend.repository;
 
+import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
 import com.covidtrail.covidtrailbackend.model.BusinessAccount;
+import com.covidtrail.covidtrailbackend.model.UserAccount;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,21 +19,29 @@ public class BusinessAccountService {
     @Autowired
     protected EntityManager manager;
 
+    @Autowired
+    protected AddressService addressService;
+
     /**
      * Get the list of all business accounts
      *
      * @return list of business account
      */
-    public List<BusinessAccount> getAllBusinessAccounts() {
+    public List<BusinessAccountDto> getAllBusinessAccounts() {
         String sql = "" +
-                " SELECT DISTINCT *" +
+                " SELECT DISTINCT" +
+                "     ID," +
+                "     BUSINESSNAME," +
+                "     EMAIL," +
+                "     PHONE," +
+                "     ADDRESS_ID" +
                 " FROM BUSINESSACCOUNT" +
                 " WHERE DELETED = 0" +
                 " ORDER BY ID DESC";
 
         Query query = manager.createNativeQuery(sql);
 
-        return (List<BusinessAccount>) query.getResultList().stream()
+        return (List<BusinessAccountDto>) query.getResultList().stream()
                 .map(this::mapToBusinessAccount).collect(Collectors.toList());
     }
 
@@ -40,13 +51,18 @@ public class BusinessAccountService {
      * @return business account
      * @throws Exception when id not found
      */
-    public BusinessAccount getBusinessAccountById(int id) throws Exception {
+    public BusinessAccountDto getBusinessAccountById(int id) throws Exception {
         if (id == 0) {
             throw new NotFoundException("Id is required");
         }
 
         String sql = "" +
-                " SELECT DISTINCT *" +
+                " SELECT DISTINCT" +
+                "     ID," +
+                "     BUSINESSNAME," +
+                "     EMAIL," +
+                "     PHONE," +
+                "     ADDRESS_ID" +
                 " FROM BUSINESSACCOUNT" +
                 " WHERE ID = :id" +
                 "     AND DELETED = 0" +
@@ -56,8 +72,43 @@ public class BusinessAccountService {
 
         query.setParameter("id", id);
 
-        return (BusinessAccount) query.getResultList().stream()
+        return (BusinessAccountDto) query.getResultList().stream()
                 .map(this::mapToBusinessAccount).collect(Collectors.toList());
+    }
+
+    /**
+     * Delete business account by id
+     *
+     * @param id - business account id
+     * @return string message
+     * @throws Exception when id not found or business account not found
+     */
+    @Transactional
+    public String deleteBusinessAccountById(int id) throws Exception {
+        if (id == 0) {
+            throw new NotFoundException("Id is required");
+        }
+
+        BusinessAccountDto businessAccount = getBusinessAccountById(id);
+
+        if (businessAccount == null) {
+            throw new NotFoundException("Business account not found with the id " + id);
+        }
+
+        String sql = "" +
+                " INSERT INTO BUSINESSACCOUNT (LAST_MODIFIED_DATETIME, DELETED_DATETIME, DELETED) " +
+                " VALUES(GETDATE(), GETDATE(), 1)" +
+                " WHERE ID = :id" +
+                "     AND DELETED = 0" +
+                " ORDER BY ID DESC";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("id", id);
+
+        query.executeUpdate();
+
+        return String.format("Business %s with id %d deleted successfully.", businessAccount.getBusinessName(), id);
     }
 
     /**
@@ -66,25 +117,16 @@ public class BusinessAccountService {
      * @param obj - Object
      * @return Business Account
      */
-    private BusinessAccount mapToBusinessAccount(Object obj) {
+    private BusinessAccountDto mapToBusinessAccount(Object obj) {
         Object[] val = (Object[]) obj;
-        BusinessAccount businessAccount = new BusinessAccount();
+        BusinessAccountDto businessAccountDto = new BusinessAccountDto();
 
-        businessAccount.setId(Integer.parseInt(val[0].toString()));
-        businessAccount.setCreatedDate((Date) val[1]);
-        businessAccount.setLastModifiedDateTime((Date) val[2]);
-        businessAccount.setDeletedDateTime((Date) val[3]);
-        businessAccount.setDeleted(Integer.parseInt(val[4].toString()));
-        businessAccount.setBusinessName((String) val[5]);
-        businessAccount.setAddressLineOne((String) val[6]);
-        businessAccount.setAddressLineTwo((String) val[7]);
-        businessAccount.setCity((String) val[8]);
-        businessAccount.setProvince((String) val[9]);
-        businessAccount.setPostalCode((String) val[10]);
-        businessAccount.setEmail((String) val[11]);
-        businessAccount.setPhone((String) val[12]);
-        businessAccount.setPassword((String) val[13]);
+        businessAccountDto.setId(Integer.parseInt(val[0].toString()));
+        businessAccountDto.setBusinessName((String) val[1]);
+        businessAccountDto.setEmail((String) val[2]);
+        businessAccountDto.setPhone((String) val[3]);
+        businessAccountDto.setAddress(addressService.getAddressById(Integer.parseInt(val[4].toString())));
 
-        return businessAccount;
+        return businessAccountDto;
     }
 }
