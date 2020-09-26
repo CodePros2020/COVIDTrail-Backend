@@ -1,6 +1,7 @@
 package com.covidtrail.covidtrailbackend.controller;
 
 import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
+import com.covidtrail.covidtrailbackend.dto.UserAccountNameUpdateDto;
 import com.covidtrail.covidtrailbackend.model.UserAccount;
 import com.covidtrail.covidtrailbackend.repository.UserAccountService;
 import io.swagger.annotations.Api;
@@ -50,15 +51,34 @@ public class UserAccountController {
         return null;
     }
 
-    @PutMapping("/{id}")
-    @ApiOperation(value = "Update an user account with id.")
+    @PutMapping("/{id}/names")
+    @ApiOperation(value = "Update an user's names with id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccountDto updateUserAccount(@RequestBody UserAccount userAccount) throws Exception {
-        // TODO
-        return null;
+    public String updateUserNamesById(@PathVariable int id, @RequestBody UserAccountNameUpdateDto request) throws Exception {
+        return userAccountService.updateUserNamesById(id, request);
+    }
+
+    @PutMapping("/{id}/email")
+    @ApiOperation(value = "Update an user's email address with id.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 500, message = "Unexpected error")})
+    public String updateUserEmailById(@PathVariable int id, @RequestParam String newEmail) throws Exception {
+        return userAccountService.updateUserEmailById(id, newEmail);
+    }
+
+    @PutMapping("/{id}/phone")
+    @ApiOperation(value = "Update an user's email address with id.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 500, message = "Unexpected error")})
+    public String updateUserPhoneById(@PathVariable int id, @RequestParam String newPhone) throws Exception {
+        return userAccountService.updateUserPhoneById(id, newPhone);
     }
 
     @DeleteMapping("/{id}")
@@ -68,6 +88,10 @@ public class UserAccountController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public String deleteUserAccountById(@PathVariable int id) throws Exception {
-        return userAccountService.deleteUserAccountById(id);
+        try {
+            return userAccountService.deleteUserAccountById(id);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 }
