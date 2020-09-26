@@ -1,6 +1,7 @@
 package com.covidtrail.covidtrailbackend.repository;
 
 import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogDto;
+import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +23,9 @@ public class PlacesVisitedLogService {
     protected BusinessAccountService businessAccountService;
 
     /**
-     * Get the list of all business accounts
+     * Get the list of all places visited logs
      *
-     * @return list of business account
+     * @return list of places visited logs
      */
     public List<PlacesVisitedLogDto> getAllPlacesVisitedLogs() {
         String sql = "" +
@@ -38,6 +39,80 @@ public class PlacesVisitedLogService {
                 " ORDER BY ID DESC";
 
         Query query = manager.createNativeQuery(sql);
+
+        return (List<PlacesVisitedLogDto>) query.getResultList().stream()
+                .map(this::mapToPlacesVisitedLog).collect(Collectors.toList());
+    }
+
+    /**
+     * Get places visited logs by id
+     *
+     * @return places visited logs
+     */
+    public PlacesVisitedLogDto getPlacesVisitedLogById(int id) {
+        String sql = "" +
+                " SELECT DISTINCT" +
+                "     ID," +
+                "     VISITED_DATETIME," +
+                "     USERACCOUNT_ID," +
+                "     BUSINESSACCOUNT_ID" +
+                " FROM PLACESVISITEDLOG" +
+                " WHERE ID = :id" +
+                "     AND DELETED = 0" +
+                " ORDER BY ID DESC";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("id", id);
+
+        return mapToPlacesVisitedLog(query.getSingleResult());
+    }
+
+    /**
+     * Get the list of places visited logs by user id
+     *
+     * @return list of places visited logs
+     */
+    public List<PlacesVisitedLogDto> getPlacesVisitedLogsByUserId(int userId) {
+        String sql = "" +
+                " SELECT DISTINCT" +
+                "     ID," +
+                "     VISITED_DATETIME," +
+                "     USERACCOUNT_ID," +
+                "     BUSINESSACCOUNT_ID" +
+                " FROM PLACESVISITEDLOG" +
+                " WHERE USERACCOUNT_ID = :userId" +
+                "     AND DELETED = 0" +
+                " ORDER BY ID DESC";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("userId", userId);
+
+        return (List<PlacesVisitedLogDto>) query.getResultList().stream()
+                .map(this::mapToPlacesVisitedLog).collect(Collectors.toList());
+    }
+
+    /**
+     * Get the list of places visited logs by business id
+     *
+     * @return list of places visited logs
+     */
+    public List<PlacesVisitedLogDto> getPlacesVisitedLogsByBusinessId(int businessId) {
+        String sql = "" +
+                " SELECT DISTINCT" +
+                "     ID," +
+                "     VISITED_DATETIME," +
+                "     USERACCOUNT_ID," +
+                "     BUSINESSACCOUNT_ID" +
+                " FROM PLACESVISITEDLOG" +
+                " WHERE BUSINESSACCOUNT_ID = :businessId" +
+                "     AND DELETED = 0" +
+                " ORDER BY ID DESC";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("businessId", businessId);
 
         return (List<PlacesVisitedLogDto>) query.getResultList().stream()
                 .map(this::mapToPlacesVisitedLog).collect(Collectors.toList());
