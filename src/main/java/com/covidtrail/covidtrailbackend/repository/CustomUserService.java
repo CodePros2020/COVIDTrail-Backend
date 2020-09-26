@@ -18,9 +18,10 @@ public class CustomUserService {
 	public CustomUser findByUserName(String userName) {
 
 		StringBuilder  sql = new StringBuilder();
-		sql.append("SELECT ID, USERNAME, PASSWORD, ROLE, FIRSTNAME, LASTNAME, DELETED \n");
+		sql.append("SELECT ID, PHONE, PASSWORD, FIRSTNAME, LASTNAME \n");
 		sql.append("	FROM USERACCOUNT \n");
-		sql.append("	WHERE USERNAME = :userName");
+		sql.append("	WHERE PHONE = :userName");
+		sql.append("	AND DELETED = 0");
 
 		Query query = manager.createNativeQuery(sql.toString());
         query.setParameter("userName", userName);
@@ -29,12 +30,10 @@ public class CustomUserService {
         
 		return new CustomUser(new CustomUserBuilder()
 				.id((Integer) val[0])
-				.username((String) val[1])
+				.phone((String) val[1])
 				.password((String) val[2])
-				.roles((String) val[3])
-				.firstName((String) val[4])
-				.lastName((String) val[5])
-				.deleted((Integer) val[6]));
+				.firstName((String) val[3])
+				.lastName((String) val[4]));
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.covidtrail.covidtrailbackend.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -20,7 +21,6 @@ public class CustomUser extends User {
 	private String firstName;
 	private String lastName;
 	private int deleted;
-	private Collection<GrantedAuthority> authorities;
 	
 	public CustomUser(int id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
 		super(username, password, authorities);
@@ -30,14 +30,12 @@ public class CustomUser extends User {
 	}
 	
 	public CustomUser(CustomUserBuilder builder) {
-		super(builder.getUsername(), builder.getPassword(), builder.getAuthorities());
+		super(builder.getPhone(), builder.getPassword(), new ArrayList<GrantedAuthority>());
 		this.id = builder.getId();
-		this.username = builder.getUsername();
+		this.username = builder.getPhone();
 		this.password = builder.getPassword();
 		this.firstName = builder.getFirstName();
 		this.lastName = builder.getLastName();
-		this.deleted = builder.getDeleted();
-		this.authorities = builder.getAuthorities();
 	}
 	
 }
