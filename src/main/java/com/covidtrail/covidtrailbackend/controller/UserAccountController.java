@@ -35,7 +35,7 @@ public class UserAccountController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public UserAccount getUserAccountById(@PathVariable int id) throws Exception {
-        return userAccountService.getUserAccount(id);
+        return userAccountService.getUserAccountById(id);
     }
 
     @PostMapping("/")
@@ -66,7 +66,7 @@ public class UserAccountController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccount deleteUserAccountById(@PathVariable int id) throws Exception {
-        return null;
+    public String deleteUserAccountById(@PathVariable int id) throws Exception {
+        return userAccountService.deleteUserAccountById(id);
     }
 }
