@@ -1,17 +1,21 @@
 package com.covidtrail.covidtrailbackend.repository;
 
-import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
-import com.covidtrail.covidtrailbackend.dto.UserAccountNameUpdateDto;
-import javassist.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.covidtrail.covidtrailbackend.dto.UserAccountCreateDto;
+import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
+import com.covidtrail.covidtrailbackend.dto.UserAccountNameUpdateDto;
+
+import javassist.NotFoundException;
 
 @Service
 public class UserAccountService {
@@ -231,6 +235,13 @@ public class UserAccountService {
         return String.format("User %s %s with id %d deleted successfully.", userAccount.getFirstName(), userAccount.getLastName(), id);
     }
 
+    public UserAccountDto createUserAccount(UserAccountCreateDto dto) {
+    	
+    	
+    	
+    	return null;
+    }
+    
     /**
      * Map object to User Account Object
      *
