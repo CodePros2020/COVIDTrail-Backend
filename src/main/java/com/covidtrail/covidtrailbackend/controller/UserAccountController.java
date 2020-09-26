@@ -1,6 +1,7 @@
 package com.covidtrail.covidtrailbackend.controller;
 
 import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
+import com.covidtrail.covidtrailbackend.dto.UserAccountNameUpdateDto;
 import com.covidtrail.covidtrailbackend.model.UserAccount;
 import com.covidtrail.covidtrailbackend.repository.UserAccountService;
 import io.swagger.annotations.Api;
@@ -23,7 +24,6 @@ public class UserAccountController {
     @ApiOperation(value = "Get a list of all user accounts.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public List<UserAccountDto> getAllUserAccounts() {
         return userAccountService.getAllUserAccounts();
@@ -33,7 +33,6 @@ public class UserAccountController {
     @ApiOperation(value = "Get an user account by id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public UserAccountDto getUserAccountById(@PathVariable int id) throws Exception {
         return userAccountService.getUserAccountById(id);
@@ -43,31 +42,61 @@ public class UserAccountController {
     @ApiOperation(value = "Create a new business account.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public UserAccountDto createUserAccount(@RequestBody UserAccount userAccount) throws Exception {
         // TODO
         return null;
     }
 
-    @PutMapping("/{id}")
-    @ApiOperation(value = "Update an user account with id.")
+    @PutMapping("/{id}/name")
+    @ApiOperation(value = "Update an user's names with id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccountDto updateUserAccount(@RequestBody UserAccount userAccount) throws Exception {
-        // TODO
-        return null;
+    public String updateUserNamesById(@PathVariable int id, @RequestBody UserAccountNameUpdateDto request) throws Exception {
+        try {
+            return userAccountService.updateUserNamesById(id, request);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    @PutMapping("/{id}/email")
+    @ApiOperation(value = "Update an user's email address with id.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 500, message = "Unexpected error")})
+    public String updateUserEmailById(@PathVariable int id, @RequestParam String newEmail) throws Exception {
+        try {
+            return userAccountService.updateUserEmailById(id, newEmail);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    @PutMapping("/{id}/phone")
+    @ApiOperation(value = "Update an user's email address with id.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 500, message = "Unexpected error")})
+    public String updateUserPhoneById(@PathVariable int id, @RequestParam String newPhone) throws Exception {
+        try {
+            return userAccountService.updateUserPhoneById(id, newPhone);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     @DeleteMapping("/{id}")
     @ApiOperation(value = "Delete an user account by id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public String deleteUserAccountById(@PathVariable int id) throws Exception {
-        return userAccountService.deleteUserAccountById(id);
+        try {
+            return userAccountService.deleteUserAccountById(id);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 }
