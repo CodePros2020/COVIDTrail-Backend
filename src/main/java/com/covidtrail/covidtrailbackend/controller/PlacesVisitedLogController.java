@@ -24,7 +24,6 @@ public class PlacesVisitedLogController {
     @ApiOperation(value = "Get a list of all places visited logs.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public List<PlacesVisitedLog> getAllPlacesVisitedLogs() throws Exception {
         // TODO
@@ -35,7 +34,6 @@ public class PlacesVisitedLogController {
     @ApiOperation(value = "Get an places visited log by id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public PlacesVisitedLog getPlacesVisitedLogById(@PathVariable int id) throws Exception {
         // TODO
@@ -46,7 +44,6 @@ public class PlacesVisitedLogController {
     @ApiOperation(value = "Get an places visited log by id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public PlacesVisitedLog getPlacesVisitedLogByUserId(@PathVariable int userId) throws Exception {
         // TODO
@@ -57,7 +54,6 @@ public class PlacesVisitedLogController {
     @ApiOperation(value = "Get an places visited log by id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public PlacesVisitedLog getPlacesVisitedLogByBusinessId(@PathVariable int businessId) throws Exception {
         // TODO
@@ -69,7 +65,6 @@ public class PlacesVisitedLogController {
     @ApiOperation(value = "Create a new places visited log.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public PlacesVisitedLog createPlacesVisitedLog(@RequestBody BusinessAccount userAccount) throws Exception {
         // TODO
@@ -80,7 +75,6 @@ public class PlacesVisitedLogController {
     @ApiOperation(value = "Update a places visited log with id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public PlacesVisitedLog updatePlacesVisitedLog(@RequestBody BusinessAccount userAccount) throws Exception {
         // TODO
@@ -91,7 +85,6 @@ public class PlacesVisitedLogController {
     @ApiOperation(value = "Delete an places visited log by id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public PlacesVisitedLog deletePlacesVisitedLogById(@PathVariable int id) throws Exception {
         // TODO
