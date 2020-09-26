@@ -12,6 +12,7 @@ public class CustomUserBuilder {
 	private String password;
 	private String firstName;
 	private String lastName;
+	private String businessName;
 
 	public CustomUserBuilder id(int id) {
 		this.id = id;
@@ -35,6 +36,11 @@ public class CustomUserBuilder {
 
 	public CustomUserBuilder lastName(String lastName) {
 		this.lastName = lastName;
+		return this;
+	}
+	
+	public CustomUserBuilder businessName(String businessName) {
+		this.businessName = businessName;
 		return this;
 	}
 

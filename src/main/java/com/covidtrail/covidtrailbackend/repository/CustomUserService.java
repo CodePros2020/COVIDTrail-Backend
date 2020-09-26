@@ -15,7 +15,7 @@ public class CustomUserService {
 	@Autowired
 	protected EntityManager manager;
 
-	public CustomUser findByUserName(String userName) {
+	public CustomUser findUserAccountByUserName(String username) {
 
 		StringBuilder  sql = new StringBuilder();
 		sql.append("SELECT ID, PHONE, PASSWORD, FIRSTNAME, LASTNAME \n");
@@ -24,16 +24,48 @@ public class CustomUserService {
 		sql.append("	AND DELETED = 0");
 
 		Query query = manager.createNativeQuery(sql.toString());
-        query.setParameter("userName", userName);
+        query.setParameter("userName", username);
 		
-        Object[] val = (Object[]) query.getSingleResult();
+        try {
+        	Object[] val = (Object[]) query.getSingleResult();
+        	
+        	return new CustomUser(new CustomUserBuilder()
+        			.id((Integer) val[0])
+        			.phone((String) val[1])
+        			.password((String) val[2])
+        			.firstName((String) val[3])
+        			.lastName((String) val[4]));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         
-		return new CustomUser(new CustomUserBuilder()
-				.id((Integer) val[0])
-				.phone((String) val[1])
-				.password((String) val[2])
-				.firstName((String) val[3])
-				.lastName((String) val[4]));
+        return null;
+	}
+	
+	public CustomUser findBusinessAccountByUserName(String username) {
+		
+		StringBuilder  sql = new StringBuilder();
+		sql.append("SELECT ID, PHONE, PASSWORD, BUSINESSNAME \n");
+		sql.append("	FROM BUSINESSACCOUNT \n");
+		sql.append("	WHERE PHONE = :userName");
+		sql.append("	AND DELETED = 0");
+		
+		Query query = manager.createNativeQuery(sql.toString());
+		query.setParameter("userName", username);
+		
+		try {
+			Object[] val = (Object[]) query.getSingleResult();
+			
+			return new CustomUser(new CustomUserBuilder()
+					.id((Integer) val[0])
+					.phone((String) val[1])
+					.password((String) val[2])
+					.businessName((String) val[3]));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 }
