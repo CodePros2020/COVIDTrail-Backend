@@ -20,11 +20,10 @@ public class AuthenticationController {
     @Autowired
     protected AuthenticationService authenticationService;
 
-    @PostMapping("/")
+    @PostMapping()
     @ApiOperation(value = "Log in.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public AccountDetailsDto login(@RequestBody LoginDto loginDto) throws Exception {
         // TODO

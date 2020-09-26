@@ -1,5 +1,6 @@
 package com.covidtrail.covidtrailbackend.controller;
 
+import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogDto;
 import com.covidtrail.covidtrailbackend.model.BusinessAccount;
 import com.covidtrail.covidtrailbackend.model.PlacesVisitedLog;
 import com.covidtrail.covidtrailbackend.repository.BusinessAccountService;
@@ -20,14 +21,13 @@ public class PlacesVisitedLogController {
     @Autowired
     protected PlacesVisitedLogService placesVisitedLogService;
 
-    @GetMapping("/")
+    @GetMapping()
     @ApiOperation(value = "Get a list of all places visited logs.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public List<PlacesVisitedLog> getAllPlacesVisitedLogs() throws Exception {
-        // TODO
-        return null;
+    public List<PlacesVisitedLogDto> getAllPlacesVisitedLogs() throws Exception {
+        return placesVisitedLogService.getAllPlacesVisitedLogs();
     }
 
     @GetMapping("/{id}")
@@ -35,7 +35,7 @@ public class PlacesVisitedLogController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public PlacesVisitedLog getPlacesVisitedLogById(@PathVariable int id) throws Exception {
+    public PlacesVisitedLogDto getPlacesVisitedLogById(@PathVariable int id) throws Exception {
         // TODO
         return null;
     }
@@ -45,7 +45,7 @@ public class PlacesVisitedLogController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public PlacesVisitedLog getPlacesVisitedLogByUserId(@PathVariable int userId) throws Exception {
+    public PlacesVisitedLogDto getPlacesVisitedLogByUserId(@PathVariable int userId) throws Exception {
         // TODO
         return null;
     }
@@ -55,18 +55,18 @@ public class PlacesVisitedLogController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public PlacesVisitedLog getPlacesVisitedLogByBusinessId(@PathVariable int businessId) throws Exception {
+    public PlacesVisitedLogDto getPlacesVisitedLogByBusinessId(@PathVariable int businessId) throws Exception {
         // TODO
         return null;
     }
 
 
-    @PostMapping("/")
+    @PostMapping()
     @ApiOperation(value = "Create a new places visited log.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public PlacesVisitedLog createPlacesVisitedLog(@RequestBody BusinessAccount userAccount) throws Exception {
+    public String createPlacesVisitedLog(@RequestBody BusinessAccount userAccount) throws Exception {
         // TODO
         return null;
     }
@@ -76,7 +76,7 @@ public class PlacesVisitedLogController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public PlacesVisitedLog updatePlacesVisitedLog(@RequestBody BusinessAccount userAccount) throws Exception {
+    public String updatePlacesVisitedLog(@RequestBody BusinessAccount userAccount) throws Exception {
         // TODO
         return null;
     }
@@ -86,7 +86,7 @@ public class PlacesVisitedLogController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public PlacesVisitedLog deletePlacesVisitedLogById(@PathVariable int id) throws Exception {
+    public String deletePlacesVisitedLogById(@PathVariable int id) throws Exception {
         // TODO
         return null;
     }

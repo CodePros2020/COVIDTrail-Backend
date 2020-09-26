@@ -20,7 +20,7 @@ public class UserAccountController {
     @Autowired
     protected UserAccountService userAccountService;
 
-    @GetMapping("/")
+    @GetMapping()
     @ApiOperation(value = "Get a list of all user accounts.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -38,7 +38,7 @@ public class UserAccountController {
         return userAccountService.getUserAccountById(id);
     }
 
-    @PostMapping("/")
+    @PostMapping()
     @ApiOperation(value = "Create a new business account.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),

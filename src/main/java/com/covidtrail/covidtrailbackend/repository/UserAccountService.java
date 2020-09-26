@@ -53,11 +53,7 @@ public class UserAccountService {
      * @return user account
      * @throws Exception when id not found
      */
-    public UserAccountDto getUserAccountById(int id) throws Exception {
-        if (id == 0) {
-            throw new NotFoundException("Id is required");
-        }
-
+    public UserAccountDto getUserAccountById(int id) {
         String sql = "" +
                 " SELECT DISTINCT " +
                 "     ID," +
