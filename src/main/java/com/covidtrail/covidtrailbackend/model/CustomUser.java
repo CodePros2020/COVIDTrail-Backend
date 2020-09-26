@@ -21,6 +21,7 @@ public class CustomUser extends User {
 	private String firstName;
 	private String lastName;
 	private int deleted;
+	private String businessName;
 	
 	public CustomUser(int id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
 		super(username, password, authorities);
@@ -36,6 +37,7 @@ public class CustomUser extends User {
 		this.password = builder.getPassword();
 		this.firstName = builder.getFirstName();
 		this.lastName = builder.getLastName();
+		this.businessName = builder.getBusinessName();
 	}
 	
 }

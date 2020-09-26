@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import com.covidtrail.covidtrailbackend.model.CustomUser;
 import com.covidtrail.covidtrailbackend.repository.CustomUserService;
 
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -14,7 +15,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		return customUserService.findByUserName(username);
+		
+		CustomUser user = customUserService.findUserAccountByUserName(username);
+		
+		if (user == null) {
+			user = customUserService.findBusinessAccountByUserName(username);
+		}
+		
+		return user;
 	}
 
 }
