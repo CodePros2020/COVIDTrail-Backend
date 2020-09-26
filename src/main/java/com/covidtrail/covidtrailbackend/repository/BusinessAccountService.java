@@ -50,11 +50,7 @@ public class BusinessAccountService {
      * @return business account
      * @throws Exception when id not found
      */
-    public BusinessAccountDto getBusinessAccountById(int id) throws Exception {
-        if (id == 0) {
-            throw new NotFoundException("Id is required");
-        }
-
+    public BusinessAccountDto getBusinessAccountById(int id) {
         String sql = "" +
                 " SELECT DISTINCT" +
                 "     ID," +
