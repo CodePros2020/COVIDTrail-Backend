@@ -1,5 +1,6 @@
 package com.covidtrail.covidtrailbackend.controller;
 
+import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
 import com.covidtrail.covidtrailbackend.model.UserAccount;
 import com.covidtrail.covidtrailbackend.repository.UserAccountService;
 import io.swagger.annotations.Api;
@@ -24,7 +25,7 @@ public class UserAccountController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public List<UserAccount> getAllUserAccounts() throws Exception {
+    public List<UserAccountDto> getAllUserAccounts() {
         return userAccountService.getAllUserAccounts();
     }
 
@@ -34,7 +35,7 @@ public class UserAccountController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccount getUserAccountById(@PathVariable int id) throws Exception {
+    public UserAccountDto getUserAccountById(@PathVariable int id) throws Exception {
         return userAccountService.getUserAccountById(id);
     }
 
@@ -44,7 +45,7 @@ public class UserAccountController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccount createUserAccount(@RequestBody UserAccount userAccount) throws Exception {
+    public UserAccountDto createUserAccount(@RequestBody UserAccount userAccount) throws Exception {
         // TODO
         return null;
     }
@@ -55,7 +56,7 @@ public class UserAccountController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccount updateUserAccount(@RequestBody UserAccount userAccount) throws Exception {
+    public UserAccountDto updateUserAccount(@RequestBody UserAccount userAccount) throws Exception {
         // TODO
         return null;
     }
