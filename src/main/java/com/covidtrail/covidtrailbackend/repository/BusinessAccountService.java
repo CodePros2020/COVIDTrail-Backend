@@ -1,8 +1,6 @@
 package com.covidtrail.covidtrailbackend.repository;
 
 import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
-import com.covidtrail.covidtrailbackend.model.BusinessAccount;
-import com.covidtrail.covidtrailbackend.model.UserAccount;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,7 +8,6 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -96,8 +93,8 @@ public class BusinessAccountService {
         }
 
         String sql = "" +
-                " INSERT INTO BUSINESSACCOUNT (LAST_MODIFIED_DATETIME, DELETED_DATETIME, DELETED) " +
-                " VALUES(GETDATE(), GETDATE(), 1)" +
+                " UPDATE BUSINESSACCOUNT" +
+                " SET LAST_MODIFIED_DATETIME = GETDATE(), DELETED_DATETIME = GETDATE(), DELETED = 1" +
                 " WHERE ID = :id" +
                 "     AND DELETED = 0" +
                 " ORDER BY ID DESC";

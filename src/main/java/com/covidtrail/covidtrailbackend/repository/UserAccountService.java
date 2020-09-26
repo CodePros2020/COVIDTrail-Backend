@@ -1,12 +1,12 @@
 package com.covidtrail.covidtrailbackend.repository;
 
 import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
-import com.covidtrail.covidtrailbackend.model.UserAccount;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 import java.util.List;
@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserAccountService {
     @Autowired
+    @PersistenceContext
     protected EntityManager manager;
 
     @Autowired
@@ -107,11 +108,10 @@ public class UserAccountService {
         }
 
         String sql = "" +
-                " INSERT INTO USERACCOUNT (LAST_MODIFIED_DATETIME, DELETED_DATETIME, DELETED) " +
-                " VALUES(GETDATE(), GETDATE(), 1)" +
+                " UPDATE USERACCOUNT" +
+                " SET LAST_MODIFIED_DATETIME = GETDATE(), DELETED_DATETIME = GETDATE(), DELETED = 1" +
                 " WHERE ID = :id" +
-                "     AND DELETED = 0" +
-                " ORDER BY ID DESC";
+                "     AND DELETED = 0";
 
         Query query = manager.createNativeQuery(sql);
 
