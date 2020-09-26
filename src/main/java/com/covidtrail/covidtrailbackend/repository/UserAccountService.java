@@ -1,6 +1,7 @@
 package com.covidtrail.covidtrailbackend.repository;
 
 import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
+import com.covidtrail.covidtrailbackend.dto.UserAccountNameUpdateDto;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,16 +77,122 @@ public class UserAccountService {
         query.setParameter("id", id);
 
         return mapToUserAccountDto(query.getSingleResult());
+    }
 
-//        return (UserAccountDto) query.getResultList().stream()
-//                .map(x -> {
-//                    try {
-//                        return mapToUserAccountDto(x);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                    return x;
-//                }).collect(Collectors.toList());
+    /**
+     * Update user's names by id
+     *
+     * @param id      - user account id
+     * @param request - UserAccountNameUpdateDto
+     * @return string message
+     * @throws Exception when id not found or user account not found
+     */
+    @Transactional
+    public String updateUserNamesById(int id, UserAccountNameUpdateDto request) throws Exception {
+        if (id == 0) {
+            throw new NotFoundException("Id is required");
+        }
+
+        UserAccountDto userAccount = getUserAccountById(id);
+
+        if (userAccount == null) {
+            throw new NotFoundException("User account not found with the id " + id);
+        }
+
+        String sql = "" +
+                " UPDATE USERACCOUNT" +
+                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
+                "     FIRSTNAME = :fName," +
+                "     MIDDLENAME = :mName," +
+                "     LASTNAME = :lName" +
+                " WHERE ID = :id" +
+                "     AND DELETED = 0";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("fName", request.getFirstName());
+        query.setParameter("mName", request.getMiddleName());
+        query.setParameter("lName", request.getLastName());
+        query.setParameter("id", id);
+
+        query.executeUpdate();
+
+        return String.format("User %d's name has been updated to '%s, %s %s'.", id,
+                request.getLastName(), request.getFirstName(), request.getMiddleName());
+    }
+
+    /**
+     * Update user's email address by id
+     *
+     * @param id      - user account id
+     * @param newEmail - new email address
+     * @return string message
+     * @throws Exception when id not found or user account not found
+     */
+    @Transactional
+    public String updateUserEmailById(int id, String newEmail) throws Exception {
+        if (id == 0) {
+            throw new NotFoundException("Id is required");
+        }
+
+        UserAccountDto userAccount = getUserAccountById(id);
+
+        if (userAccount == null) {
+            throw new NotFoundException("User account not found with the id " + id);
+        }
+
+        String sql = "" +
+                " UPDATE USERACCOUNT" +
+                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
+                "     EMAIL = :newEmail" +
+                " WHERE ID = :id" +
+                "     AND DELETED = 0";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("newEmail", newEmail);
+        query.setParameter("id", id);
+
+        query.executeUpdate();
+
+        return String.format("User %d's email address has been updated to %s.", id, newEmail);
+    }
+
+    /**
+     * Update user's phone number by id
+     *
+     * @param id      - user account id
+     * @param newPhone - new phone number
+     * @return string message
+     * @throws Exception when id not found or user account not found
+     */
+    @Transactional
+    public String updateUserPhoneById(int id, String newPhone) throws Exception {
+        if (id == 0) {
+            throw new NotFoundException("Id is required");
+        }
+
+        UserAccountDto userAccount = getUserAccountById(id);
+
+        if (userAccount == null) {
+            throw new NotFoundException("User account not found with the id " + id);
+        }
+
+        String sql = "" +
+                " UPDATE USERACCOUNT" +
+                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
+                "     PHONE = :newPhone" +
+                " WHERE ID = :id" +
+                "     AND DELETED = 0";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("newPhone", newPhone);
+        query.setParameter("id", id);
+
+        query.executeUpdate();
+
+        return String.format("User %d's phone number has been updated to %s.", id, newPhone);
     }
 
     /**
@@ -109,7 +216,9 @@ public class UserAccountService {
 
         String sql = "" +
                 " UPDATE USERACCOUNT" +
-                " SET LAST_MODIFIED_DATETIME = GETDATE(), DELETED_DATETIME = GETDATE(), DELETED = 1" +
+                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
+                "     DELETED_DATETIME = GETDATE()," +
+                "     DELETED = 1" +
                 " WHERE ID = :id" +
                 "     AND DELETED = 0";
 
