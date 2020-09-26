@@ -23,10 +23,10 @@ public class UserAccountService {
      */
     public List<UserAccount> getAllUserAccounts() {
         String sql = "" +
-                "SELECT DISTINCT * " +
-                "FROM UserAccount " +
-                "WHERE DELETED = 0 " +
-                "ORDER BY ID DESC ";
+                " SELECT DISTINCT *" +
+                " FROM USERACCOUNT" +
+                " WHERE DELETED = 0" +
+                " ORDER BY ID DESC";
 
         Query query = manager.createNativeQuery(sql);
 
@@ -38,18 +38,19 @@ public class UserAccountService {
      * Get user account by id
      *
      * @return user account
+     * @throws Exception when id not found
      */
-    public UserAccount getUserAccount(int id) throws Exception {
+    public UserAccount getUserAccountById(int id) throws Exception {
         if (id == 0) {
             throw new NotFoundException("Id is required");
         }
 
         String sql = "" +
-                "SELECT DISTINCT * " +
-                "FROM UserAccount " +
-                "WHERE ID = :id " +
-                "    AND DELETED = 0" +
-                "ORDER BY ID DESC";
+                " SELECT DISTINCT *" +
+                " FROM USERACCOUNT" +
+                " WHERE ID = :id" +
+                "     AND DELETED = 0" +
+                " ORDER BY ID DESC";
 
         Query query = manager.createNativeQuery(sql);
 
@@ -57,6 +58,40 @@ public class UserAccountService {
 
         return (UserAccount) query.getResultList().stream()
                 .map(this::mapToUserAccount).collect(Collectors.toList());
+    }
+
+    /**
+     * Delete user account by id
+     *
+     * @param id - user account id
+     * @return string message
+     * @throws Exception when id not found or user acoount not found
+     */
+    public String deleteUserAccountById(int id) throws Exception {
+        if (id == 0) {
+            throw new NotFoundException("Id is required");
+        }
+
+        UserAccount userAccount = getUserAccountById(id);
+
+        if (userAccount == null) {
+            throw new NotFoundException("User account not found with the id " + id);
+        }
+
+        String sql = "" +
+                " INSERT INTO USERACCOUNT (LAST_MODIFIED_DATETIME, DELETED_DATETIME, DELETED) " +
+                " VALUES(GETDATE(), GETDATE(), 1)" +
+                " WHERE ID = :id" +
+                "     AND DELETED = 0" +
+                " ORDER BY ID DESC";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("id", id);
+
+        query.getResultList();
+
+        return String.format("User %s %s with id %d deleted successfully.", userAccount.getFirstName(), userAccount.getLastName(), id);
     }
 
     /**
