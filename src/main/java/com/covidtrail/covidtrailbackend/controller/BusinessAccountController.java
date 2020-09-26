@@ -36,8 +36,7 @@ public class BusinessAccountController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public BusinessAccount getBusinessAccountById(@PathVariable int id) throws Exception {
-        // TODO
-        return null;
+        return businessAccountService.getBusinessAccountById(id);
     }
 
     @PostMapping("/")
