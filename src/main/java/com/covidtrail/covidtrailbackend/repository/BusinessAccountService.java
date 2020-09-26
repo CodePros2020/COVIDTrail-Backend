@@ -5,12 +5,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BusinessAccountService {
     @Autowired
     protected EntityManager manager;
+
+    /**
+     * Get the list of all business accounts
+     *
+     * @return list of business account
+     */
+    public List<BusinessAccount> getAllBusinessAccounts() {
+        String sql = "" +
+                " SELECT DISTINCT *" +
+                " FROM BUSINESSACCOUNT" +
+                " WHERE DELETED = 0" +
+                " ORDER BY ID DESC";
+
+        Query query = manager.createNativeQuery(sql);
+
+        return (List<BusinessAccount>) query.getResultList().stream()
+                .map(this::mapToBusinessAccount).collect(Collectors.toList());
+    }
 
     /**
      * Map object to Business Account Object
