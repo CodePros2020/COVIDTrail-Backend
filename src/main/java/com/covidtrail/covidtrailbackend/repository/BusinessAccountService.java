@@ -1,6 +1,8 @@
 package com.covidtrail.covidtrailbackend.repository;
 
 import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
+import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
+import com.covidtrail.covidtrailbackend.dto.UserAccountNameUpdateDto;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,6 +76,117 @@ public class BusinessAccountService {
     }
 
     /**
+     * Update business names by id
+     *
+     * @param id      - business account id
+     * @param newName - new business name
+     * @return string message
+     * @throws Exception when id not found or business account not found
+     */
+    @Transactional
+    public String updateBusinessNamesById(int id, String newName) throws Exception {
+        if (id == 0) {
+            throw new NotFoundException("Id is required");
+        }
+
+        BusinessAccountDto businessAccountDto = getBusinessAccountById(id);
+
+        if (businessAccountDto == null) {
+            throw new NotFoundException("Business account not found with the id " + id);
+        }
+
+        String sql = "" +
+                " UPDATE BUSINESSACCOUNT" +
+                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
+                "     BUSINESSNAME = :name" +
+                " WHERE ID = :id" +
+                "     AND DELETED = 0";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("name", newName);
+        query.setParameter("id", id);
+
+        query.executeUpdate();
+
+        return String.format("Business %d's name has been updated to %s.", id, newName);
+    }
+
+    /**
+     * Update business email address by id
+     *
+     * @param id      - business account id
+     * @param newEmail - new email address
+     * @return string message
+     * @throws Exception when id not found or business account not found
+     */
+    @Transactional
+    public String updateBusinessEmailById(int id, String newEmail) throws Exception {
+        if (id == 0) {
+            throw new NotFoundException("Id is required");
+        }
+
+        BusinessAccountDto businessAccountDto = getBusinessAccountById(id);
+
+        if (businessAccountDto == null) {
+            throw new NotFoundException("Business account not found with the id " + id);
+        }
+
+        String sql = "" +
+                " UPDATE BUSINESSACCOUNT" +
+                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
+                "     EMAIL = :newEmail" +
+                " WHERE ID = :id" +
+                "     AND DELETED = 0";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("newEmail", newEmail);
+        query.setParameter("id", id);
+
+        query.executeUpdate();
+
+        return String.format("Business %d's email address has been updated to %s.", id, newEmail);
+    }
+
+    /**
+     * Update business' phone number by id
+     *
+     * @param id      - business account id
+     * @param newPhone - new phone number
+     * @return string message
+     * @throws Exception when id not found or business account not found
+     */
+    @Transactional
+    public String updateBusinessPhoneById(int id, String newPhone) throws Exception {
+        if (id == 0) {
+            throw new NotFoundException("Id is required");
+        }
+
+        BusinessAccountDto businessAccountDto = getBusinessAccountById(id);
+
+        if (businessAccountDto == null) {
+            throw new NotFoundException("Business account not found with the id " + id);
+        }
+
+        String sql = "" +
+                " UPDATE BUSINESSACCOUNT" +
+                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
+                "     PHONE = :newPhone" +
+                " WHERE ID = :id" +
+                "     AND DELETED = 0";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("newPhone", newPhone);
+        query.setParameter("id", id);
+
+        query.executeUpdate();
+
+        return String.format("Business %d's phone number has been updated to %s.", id, newPhone);
+    }
+
+    /**
      * Delete business account by id
      *
      * @param id - business account id
@@ -95,9 +208,7 @@ public class BusinessAccountService {
         String sql = "" +
                 " UPDATE BUSINESSACCOUNT" +
                 " SET LAST_MODIFIED_DATETIME = GETDATE(), DELETED_DATETIME = GETDATE(), DELETED = 1" +
-                " WHERE ID = :id" +
-                "     AND DELETED = 0" +
-                " ORDER BY ID DESC";
+                " WHERE ID = :id AND DELETED = 0";
 
         Query query = manager.createNativeQuery(sql);
 
