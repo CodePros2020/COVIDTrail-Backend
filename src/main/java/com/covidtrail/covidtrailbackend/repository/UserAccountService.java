@@ -51,7 +51,6 @@ public class UserAccountService {
      * Get user account by id
      *
      * @return user account
-     * @throws Exception when id not found
      */
     public UserAccountDto getUserAccountById(int id) {
         String sql = "" +
