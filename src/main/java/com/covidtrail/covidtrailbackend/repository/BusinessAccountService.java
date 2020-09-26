@@ -1,6 +1,7 @@
 package com.covidtrail.covidtrailbackend.repository;
 
 import com.covidtrail.covidtrailbackend.model.BusinessAccount;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,32 @@ public class BusinessAccountService {
         Query query = manager.createNativeQuery(sql);
 
         return (List<BusinessAccount>) query.getResultList().stream()
+                .map(this::mapToBusinessAccount).collect(Collectors.toList());
+    }
+
+    /**
+     * Get business account by id
+     *
+     * @return business account
+     * @throws Exception when id not found
+     */
+    public BusinessAccount getBusinessAccountById(int id) throws Exception {
+        if (id == 0) {
+            throw new NotFoundException("Id is required");
+        }
+
+        String sql = "" +
+                " SELECT DISTINCT *" +
+                " FROM BUSINESSACCOUNT" +
+                " WHERE ID = :id" +
+                "     AND DELETED = 0" +
+                " ORDER BY ID DESC";
+
+        Query query = manager.createNativeQuery(sql);
+
+        query.setParameter("id", id);
+
+        return (BusinessAccount) query.getResultList().stream()
                 .map(this::mapToBusinessAccount).collect(Collectors.toList());
     }
 
