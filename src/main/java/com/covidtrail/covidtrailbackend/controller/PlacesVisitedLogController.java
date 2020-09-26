@@ -94,6 +94,7 @@ public class PlacesVisitedLogController {
             @ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Unexpected error")})
     public PlacesVisitedLog deletePlacesVisitedLogById(@PathVariable int id) throws Exception {
+        // TODO
         return null;
     }
 }
