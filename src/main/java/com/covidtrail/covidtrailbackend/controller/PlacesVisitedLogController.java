@@ -1,6 +1,8 @@
 package com.covidtrail.covidtrailbackend.controller;
 
+import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogBusinessDto;
 import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogDto;
+import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogUserDto;
 import com.covidtrail.covidtrailbackend.repository.PlacesVisitedLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,7 +43,7 @@ public class PlacesVisitedLogController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public List<PlacesVisitedLogDto> getPlacesVisitedLogsByUserId(@PathVariable int userId) {
+    public List<PlacesVisitedLogBusinessDto> getPlacesVisitedLogsByUserId(@PathVariable int userId) {
         return placesVisitedLogService.getPlacesVisitedLogsByUserId(userId);
     }
 
@@ -50,7 +52,7 @@ public class PlacesVisitedLogController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public List<PlacesVisitedLogDto> getPlacesVisitedLogsByBusinessId(@PathVariable int businessId) {
+    public List<PlacesVisitedLogUserDto> getPlacesVisitedLogsByBusinessId(@PathVariable int businessId) {
         return placesVisitedLogService.getPlacesVisitedLogsByBusinessId(businessId);
     }
 
