@@ -1,5 +1,7 @@
 package com.covidtrail.covidtrailbackend;
 
+import java.util.TimeZone;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -11,5 +13,7 @@ public class CovidtrailbackendApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CovidtrailbackendApplication.class, args);
 		System.out.println("Project started and now running...");
+		
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 	}
 }
