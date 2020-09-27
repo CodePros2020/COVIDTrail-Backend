@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.covidtrail.covidtrailbackend.config.SessionInfo;
+import com.covidtrail.covidtrailbackend.dto.BusinessAccountCreateDto;
 import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
-import com.covidtrail.covidtrailbackend.model.BusinessAccount;
 import com.covidtrail.covidtrailbackend.model.CustomUser;
 import com.covidtrail.covidtrailbackend.repository.BusinessAccountService;
 
@@ -61,9 +61,8 @@ public class BusinessAccountController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public BusinessAccountDto createUserAccount(@RequestBody BusinessAccount userAccount) throws Exception {
-        // TODO
-        return null;
+    public String createBusinessAccount(@RequestBody BusinessAccountCreateDto dto) throws Exception {
+        return businessAccountService.createBusinessAccount(dto);
     }
 
 

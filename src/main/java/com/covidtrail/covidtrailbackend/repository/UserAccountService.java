@@ -16,6 +16,7 @@ import com.covidtrail.covidtrailbackend.dto.AddressCreateDto;
 import com.covidtrail.covidtrailbackend.dto.UserAccountCreateDto;
 import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
 import com.covidtrail.covidtrailbackend.dto.UserAccountNameUpdateDto;
+import com.covidtrail.covidtrailbackend.model.PhoneService;
 
 import javassist.NotFoundException;
 
@@ -27,6 +28,9 @@ public class UserAccountService {
 
 	@Autowired
 	protected AddressService addressService;
+	
+	@Autowired
+	protected PhoneService phoneService;
 
 	/**
 	 * Get the list of all user accounts
@@ -235,6 +239,12 @@ public class UserAccountService {
 	@Transactional
 	public String createUserAccount(UserAccountCreateDto dto) {
 
+		boolean isDuplicated = phoneService.findDuplicatedPhones(dto.getPhone());
+		
+		if (isDuplicated) {
+			throw new IllegalArgumentException("The phone number already exists.");
+		}
+		
 		AddressCreateDto addressDto = dto.getAddress();
 		
 		StringBuilder sqlAddress = new StringBuilder();
