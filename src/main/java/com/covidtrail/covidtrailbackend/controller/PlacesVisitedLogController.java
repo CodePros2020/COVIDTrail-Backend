@@ -36,7 +36,7 @@ public class PlacesVisitedLogController {
         return placesVisitedLogService.getPlacesVisitedLogById(id);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/{userId}/user")
     @ApiOperation(value = "Get an places visited log by user id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
@@ -45,7 +45,7 @@ public class PlacesVisitedLogController {
         return placesVisitedLogService.getPlacesVisitedLogsByUserId(userId);
     }
 
-    @GetMapping("/{businessId}")
+    @GetMapping("/{businessId}/business")
     @ApiOperation(value = "Get an places visited log by business id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),

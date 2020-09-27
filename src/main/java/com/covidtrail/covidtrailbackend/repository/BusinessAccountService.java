@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.covidtrail.covidtrailbackend.dto.AddressCreateDto;
+import com.covidtrail.covidtrailbackend.dto.AddressDto;
 import com.covidtrail.covidtrailbackend.dto.BusinessAccountCreateDto;
 import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
 import com.covidtrail.covidtrailbackend.model.PhoneService;
@@ -74,8 +75,7 @@ public class BusinessAccountService {
 
 		query.setParameter("id", id);
 
-		return (BusinessAccountDto) query.getResultList().stream()
-				.map(this::mapToBusinessAccount).collect(Collectors.toList());
+		return mapToBusinessAccount(query.getSingleResult());
 	}
 
 	/**
@@ -162,10 +162,13 @@ public class BusinessAccountService {
 	 */
 	@Transactional
 	public String updateBusinessPhoneById(int id, String newPhone) throws Exception {
-		if (id == 0) {
-			throw new NotFoundException("Id is required");
-		}
 
+		boolean isDuplicated = phoneService.findDuplicatedPhones(newPhone);
+		
+		if (isDuplicated) {
+			throw new IllegalArgumentException("The phone number already exists.");
+		}
+		
 		BusinessAccountDto businessAccountDto = getBusinessAccountById(id);
 
 		if (businessAccountDto == null) {
@@ -212,12 +215,24 @@ public class BusinessAccountService {
 				" UPDATE BUSINESSACCOUNT" +
 				" SET LAST_MODIFIED_DATETIME = GETDATE(), DELETED_DATETIME = GETDATE(), DELETED = 1" +
 				" WHERE ID = :id AND DELETED = 0";
-
+		
 		Query query = manager.createNativeQuery(sql);
-
 		query.setParameter("id", id);
-
 		query.executeUpdate();
+		
+		AddressDto address = businessAccount.getAddress();
+		
+		if (address != null) {
+			
+			String sqlAddress = "" +
+					" UPDATE ADDRESS" +
+					" SET LAST_MODIFIED_DATETIME = GETDATE(), DELETED_DATETIME = GETDATE(), DELETED = 1" +
+					" WHERE ID = :idAddress AND DELETED = 0";
+			
+			query = manager.createNativeQuery(sqlAddress);
+			query.setParameter("idAddress", address.getId());
+			query.executeUpdate();
+		}
 
 		return String.format("Business %s with id %d deleted successfully.", businessAccount.getBusinessName(), id);
 	}
