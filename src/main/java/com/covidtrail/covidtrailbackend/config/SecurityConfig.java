@@ -40,47 +40,49 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		String[] noAuthPaths = {
-				"/swagger-ui.html",
-				"/v2/api-docs",
-				"/configuration/ui/**",
-				"/swagger-resources/**",
-				"/configuration/security/**",
-				"/swagger-ui.html",
-				"/webjars/**"};
+        String[] noAuthPaths = {
+                "/swagger-ui.html",
+                "/v2/api-docs",
+                "/configuration/ui/**",
+                "/swagger-resources/**",
+                "/configuration/security/**",
+                "/swagger-ui.html",
+                "/webjars/**",
+                "/api/businessAccount/create",
+                "/api/userAccount/create"};
 
-		SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
-		successHandler.setTargetUrlParameter("redirectTo");
-		successHandler.setDefaultTargetUrl("/api/authentication/success");
-		successHandler.setAlwaysUseDefaultTargetUrl(true);
-		
-		http.cors();
-		http.csrf().disable()
-		.authorizeRequests()
-		.antMatchers(noAuthPaths).permitAll()
-		.and()
-			.authorizeRequests()
-			.anyRequest().authenticated()
-		.and()
-			.formLogin().permitAll()
-			.successHandler(successHandler)
-		.and()
-			.logout()
-			.logoutSuccessUrl("/api/authentication/success")
-			.permitAll();
-		
-		http.exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPoint() {
+        SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+        successHandler.setTargetUrlParameter("redirectTo");
+        successHandler.setDefaultTargetUrl("/api/authentication/success");
+        successHandler.setAlwaysUseDefaultTargetUrl(true);
 
-	        @Override
-	        public void commence(HttpServletRequest request, HttpServletResponse response,
-	                AuthenticationException authException) throws IOException, ServletException {
-	        	response.isCommitted();
-	        	response.sendError(403, "Forbidden");
-	        }
-	    });
-		
-		
-	}
-	
+        http.cors();
+        http.csrf().disable()
+                .authorizeRequests()
+                .antMatchers(noAuthPaths).permitAll()
+                .and()
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin().permitAll()
+                .successHandler(successHandler)
+                .and()
+                .logout()
+                .logoutSuccessUrl("/api/authentication/success")
+                .permitAll();
+
+        http.exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPoint() {
+
+            @Override
+            public void commence(HttpServletRequest request, HttpServletResponse response,
+                                 AuthenticationException authException) throws IOException, ServletException {
+                response.isCommitted();
+                response.sendError(403, "Forbidden");
+            }
+        });
+
+
+    }
+
 
 }
