@@ -1,18 +1,28 @@
 package com.covidtrail.covidtrailbackend.repository;
 
-import com.covidtrail.covidtrailbackend.dto.*;
-import javassist.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
+import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogBusinessDatailsDto;
+import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogBusinessDto;
+import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogDto;
+import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogUserDetailsDto;
+import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogUserDto;
+import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
+import com.covidtrail.covidtrailbackend.utils.DateUtils;
+
+import javassist.NotFoundException;
 
 @Service
 public class PlacesVisitedLogService {
@@ -34,7 +44,6 @@ public class PlacesVisitedLogService {
         String sql = "" +
                 " SELECT DISTINCT" +
                 "     ID," +
-                "     CONVERT(DATE, VISITED_DATETIME)," +
                 "     VISITED_DATETIME," +
                 "     USERACCOUNT_ID," +
                 "     BUSINESSACCOUNT_ID" +
@@ -57,7 +66,6 @@ public class PlacesVisitedLogService {
         String sql = "" +
                 " SELECT DISTINCT" +
                 "     ID," +
-                "     CONVERT(DATE, VISITED_DATETIME)," +
                 "     VISITED_DATETIME," +
                 "     USERACCOUNT_ID," +
                 "     BUSINESSACCOUNT_ID" +
@@ -82,7 +90,6 @@ public class PlacesVisitedLogService {
         String sql = "" +
                 " SELECT DISTINCT" +
                 "     ID," +
-                "     CONVERT(DATE, VISITED_DATETIME)," +
                 "     VISITED_DATETIME," +
                 "     USERACCOUNT_ID," +
                 "     BUSINESSACCOUNT_ID" +
@@ -103,7 +110,7 @@ public class PlacesVisitedLogService {
         PlacesVisitedLogBusinessDatailsDto businessDetailsTemp;
 
         for (PlacesVisitedLogDto dto : queryResult) {
-            Date visitedDate = dto.getVisitedDate();
+            String visitedDate = dto.getVisitedDate();
             int i = 0;
 
             PlacesVisitedLogBusinessDto temp = null;
@@ -159,7 +166,6 @@ public class PlacesVisitedLogService {
         String sql = "" +
                 " SELECT DISTINCT" +
                 "     ID," +
-                "     CONVERT(DATE, VISITED_DATETIME)," +
                 "     VISITED_DATETIME," +
                 "     USERACCOUNT_ID," +
                 "     BUSINESSACCOUNT_ID" +
@@ -180,7 +186,7 @@ public class PlacesVisitedLogService {
         PlacesVisitedLogUserDetailsDto userDetailsTemp;
 
         for (PlacesVisitedLogDto dto : queryResult) {
-            Date visitedDate = dto.getVisitedDate();
+            String visitedDate = dto.getVisitedDate();
             int i = 0;
 
             PlacesVisitedLogUserDto temp = null;
@@ -272,16 +278,37 @@ public class PlacesVisitedLogService {
      *
      * @param obj - Object
      * @return Business Account
+     * @throws ParseException 
      */
     private PlacesVisitedLogDto mapToPlacesVisitedLog(Object obj) {
         Object[] val = (Object[]) obj;
         PlacesVisitedLogDto placesVisitedLogDto = new PlacesVisitedLogDto();
 
         placesVisitedLogDto.setId(Integer.parseInt(val[0].toString()));
-        placesVisitedLogDto.setVisitedDate((Date) val[1]);
-        placesVisitedLogDto.setVisitedDateTime((Date) val[2]);
-        placesVisitedLogDto.setUserAccount(userAccountService.getUserAccountById(Integer.parseInt(val[3].toString())));
-        placesVisitedLogDto.setBusinessAccount(businessAccountService.getBusinessAccountById(Integer.parseInt(val[4].toString())));
+        
+        try {
+			
+        	Date visitedDateTime = (Date) val[1];
+        	String formatedVisitedDate = DateUtils
+        			.to_YYYY_MM_DD(visitedDateTime)
+        			.toET()
+        			.getFormatedDate();
+        	
+        	placesVisitedLogDto.setVisitedDate(formatedVisitedDate);
+        	
+        	String formatedVisitedDateTime = DateUtils
+        			.to_YYYY_MM_DD_HH_MM(visitedDateTime)
+        			.toET()
+        			.getFormatedDate();
+        	
+        	placesVisitedLogDto.setVisitedDateTime(formatedVisitedDateTime);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e.getMessage());
+		}
+        
+        placesVisitedLogDto.setUserAccount(userAccountService.getUserAccountById(Integer.parseInt(val[2].toString())));
+        placesVisitedLogDto.setBusinessAccount(businessAccountService.getBusinessAccountById(Integer.parseInt(val[3].toString())));
 
         return placesVisitedLogDto;
     }

@@ -4,13 +4,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-
 @Getter
 @Setter
 @NoArgsConstructor
 public class PlacesVisitedLogBusinessDatailsDto {
     private int id;
-    private Date visitedDateTime;
+    private String visitedDateTime;
     private BusinessAccountDto businessAccount;
 }
