@@ -53,7 +53,7 @@ public class UserAccountController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public UserAccountDto createUserAccount(@RequestBody UserAccountCreateDto dto) throws Exception {
+    public String createUserAccount(@RequestBody UserAccountCreateDto dto) throws Exception {
     	return userAccountService.createUserAccount(dto);
     }
 
