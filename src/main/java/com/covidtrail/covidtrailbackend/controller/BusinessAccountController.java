@@ -13,10 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.covidtrail.covidtrailbackend.config.SessionInfo;
 import com.covidtrail.covidtrailbackend.dto.BusinessAccountCreateDto;
 import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
-import com.covidtrail.covidtrailbackend.model.CustomUser;
 import com.covidtrail.covidtrailbackend.repository.BusinessAccountService;
 
 import io.swagger.annotations.Api;
@@ -31,20 +29,13 @@ public class BusinessAccountController {
     @Autowired
     protected BusinessAccountService businessAccountService;
 
-    @Autowired
-    protected SessionInfo sessionInfo;
-
     @GetMapping()
     @ApiOperation(value = "Get a list of all business accounts.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 500, message = "Unexpected error")})
+    		@ApiResponse(code = 200, message = "Success"),
+    		@ApiResponse(code = 500, message = "Unexpected error")})
     public List<BusinessAccountDto> getAllBusinessAccounts() throws Exception {
-    	
-    	CustomUser user = sessionInfo.getCurrentUser();
-    	System.out.println(user.getBusinessName());
-    	
-        return businessAccountService.getAllBusinessAccounts();
+    	return businessAccountService.getAllBusinessAccounts();
     }
 
     @GetMapping("/{id}")
@@ -64,7 +55,6 @@ public class BusinessAccountController {
     public String createBusinessAccount(@RequestBody BusinessAccountCreateDto dto) throws Exception {
         return businessAccountService.createBusinessAccount(dto);
     }
-
 
     @PutMapping("/{id}/name")
     @ApiOperation(value = "Update an business names with id.")

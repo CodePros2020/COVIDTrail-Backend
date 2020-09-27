@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.covidtrail.covidtrailbackend.dto.AddressCreateDto;
+import com.covidtrail.covidtrailbackend.dto.AddressDto;
 import com.covidtrail.covidtrailbackend.dto.UserAccountCreateDto;
 import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
 import com.covidtrail.covidtrailbackend.dto.UserAccountNameUpdateDto;
@@ -28,7 +29,7 @@ public class UserAccountService {
 
 	@Autowired
 	protected AddressService addressService;
-	
+
 	@Autowired
 	protected PhoneService phoneService;
 
@@ -173,8 +174,11 @@ public class UserAccountService {
 	 */
 	@Transactional
 	public String updateUserPhoneById(int id, String newPhone) throws Exception {
-		if (id == 0) {
-			throw new NotFoundException("Id is required");
+
+		boolean isDuplicated = phoneService.findDuplicatedPhones(newPhone);
+
+		if (isDuplicated) {
+			throw new IllegalArgumentException("The phone number already exists.");
 		}
 
 		UserAccountDto userAccount = getUserAccountById(id);
@@ -228,11 +232,23 @@ public class UserAccountService {
 				"     AND DELETED = 0";
 
 		Query query = manager.createNativeQuery(sql);
-
 		query.setParameter("id", id);
-
 		query.executeUpdate();
 
+		AddressDto address = userAccount.getAddress();
+		
+		if (address != null) {
+			
+			String sqlAddress = "" +
+					" UPDATE ADDRESS" +
+					" SET LAST_MODIFIED_DATETIME = GETDATE(), DELETED_DATETIME = GETDATE(), DELETED = 1" +
+					" WHERE ID = :idAddress AND DELETED = 0";
+			
+			query = manager.createNativeQuery(sqlAddress);
+			query.setParameter("idAddress", address.getId());
+			query.executeUpdate();
+		}
+		
 		return String.format("User %s %s with id %d deleted successfully.", userAccount.getFirstName(), userAccount.getLastName(), id);
 	}
 
@@ -240,18 +256,18 @@ public class UserAccountService {
 	public String createUserAccount(UserAccountCreateDto dto) {
 
 		boolean isDuplicated = phoneService.findDuplicatedPhones(dto.getPhone());
-		
+
 		if (isDuplicated) {
 			throw new IllegalArgumentException("The phone number already exists.");
 		}
-		
+
 		AddressCreateDto addressDto = dto.getAddress();
-		
+
 		StringBuilder sqlAddress = new StringBuilder();
 		sqlAddress.append("INSERT into ADDRESS(CREATED_DATETIME, DELETED, ADDRESS_LINE_ONE, ADDRESS_LINE_TWO, CITY, PROVINCE, POSTAL_CODE) \n");
 		sqlAddress.append(" OUTPUT Inserted.ID \n");
 		sqlAddress.append(" VALUES (GETDATE(), 0, :addressLineOne, :addressLineTwo, :city, :province, :postalCode)");
-		
+
 		Query query = manager.createNativeQuery(sqlAddress.toString());
 
 		query.setParameter("addressLineOne", addressDto.getAddressLineOne());
@@ -262,7 +278,7 @@ public class UserAccountService {
 
 		Integer lastAddressId = (Integer) query.getSingleResult();
 		System.out.println(lastAddressId);
-		
+
 		StringBuilder sqlUserAccount = new StringBuilder();
 		sqlUserAccount.append("INSERT into USERACCOUNT(CREATED_DATETIME, DELETED, FIRSTNAME, MIDDLENAME, LASTNAME, ADDRESS_ID, EMAIL, PHONE, PASSWORD) \n");
 		sqlUserAccount.append(" VALUES (GETDATE(), 0, :firstName, :middleName, :lastName, :addressId, :email, :phone, :password) ");

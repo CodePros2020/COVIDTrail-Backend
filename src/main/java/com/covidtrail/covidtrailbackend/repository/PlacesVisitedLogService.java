@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
+
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -127,6 +129,7 @@ public class PlacesVisitedLogService {
      * @param businessId - business account id
      * @return string message
      */
+    @Transactional
     public String createPlacesVisitedLog(int userId, int businessId) throws Exception {
         UserAccountDto userAccount = userAccountService.getUserAccountById(userId);
         BusinessAccountDto businessAccount = businessAccountService.getBusinessAccountById(businessId);
@@ -140,8 +143,8 @@ public class PlacesVisitedLogService {
         }
 
         String sql = "" +
-                " INSERT INTO PLACESVISITEDLOG (CREATED_DATETIME, LAST_MODIFIED_DATETIME, DELETED, VISITED_DATETIME, USERACCOUNT_ID, BUSINESSACCOUNT_ID)" +
-                " VALUES (GETDATE(), GETDATE(), 0, GETDATE(), :userId, :businessId)";
+                " INSERT INTO PLACESVISITEDLOG (CREATED_DATETIME, DELETED, VISITED_DATETIME, USERACCOUNT_ID, BUSINESSACCOUNT_ID)" +
+                " VALUES (GETDATE(), 0, GETDATE(), :userId, :businessId)";
 
         Query query = manager.createNativeQuery(sql);
 
@@ -164,9 +167,9 @@ public class PlacesVisitedLogService {
         PlacesVisitedLogDto placesVisitedLogDto = new PlacesVisitedLogDto();
 
         placesVisitedLogDto.setId(Integer.parseInt(val[0].toString()));
-        placesVisitedLogDto.setUserAccount(userAccountService.getUserAccountById(Integer.parseInt(val[1].toString())));
-        placesVisitedLogDto.setBusinessAccount(businessAccountService.getBusinessAccountById(Integer.parseInt(val[2].toString())));
-        placesVisitedLogDto.setVisitedDateTime((Date) val[3]);
+        placesVisitedLogDto.setVisitedDateTime((Date) val[1]);
+        placesVisitedLogDto.setUserAccount(userAccountService.getUserAccountById(Integer.parseInt(val[2].toString())));
+        placesVisitedLogDto.setBusinessAccount(businessAccountService.getBusinessAccountById(Integer.parseInt(val[3].toString())));
 
         return placesVisitedLogDto;
     }
