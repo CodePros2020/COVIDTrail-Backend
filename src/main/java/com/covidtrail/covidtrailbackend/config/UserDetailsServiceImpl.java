@@ -9,13 +9,11 @@ import com.covidtrail.covidtrailbackend.model.CustomUser;
 import com.covidtrail.covidtrailbackend.repository.CustomUserService;
 
 public class UserDetailsServiceImpl implements UserDetailsService {
-
 	@Autowired
-	private CustomUserService customUserService;
+	protected CustomUserService customUserService;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		
 		CustomUser user = customUserService.findUserAccountByUserName(username);
 		
 		if (user == null) {
@@ -24,5 +22,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		
 		return user;
 	}
-
 }
