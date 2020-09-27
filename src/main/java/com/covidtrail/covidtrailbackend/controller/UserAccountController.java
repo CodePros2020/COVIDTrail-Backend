@@ -48,7 +48,7 @@ public class UserAccountController {
         return userAccountService.getUserAccountById(id);
     }
 
-    @PostMapping()
+    @PostMapping("/create")
     @ApiOperation(value = "Create a new user account.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),

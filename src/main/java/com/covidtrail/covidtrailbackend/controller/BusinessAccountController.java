@@ -47,7 +47,7 @@ public class BusinessAccountController {
         return businessAccountService.getBusinessAccountById(id);
     }
 
-    @PostMapping()
+    @PostMapping("/create")
     @ApiOperation(value = "Create a new business account.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
