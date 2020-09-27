@@ -31,6 +31,15 @@ public class AuthenticationController {
     public AccountDetailsDto success() throws Exception {
         return authenticationService.getLoggedInUserDetails();
     }
+	
+	@GetMapping("/logoutSuccess")
+	@ApiOperation(value = "Logged in the user successfully.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 500, message = "Unexpected error")})
+	public String logout() throws Exception {
+		return "You have been logged out successfully.";
+	}
 
 	@RequestMapping(value="/login", method = RequestMethod.GET)
 	public String login(ModelMap model,HttpServletRequest request) {
