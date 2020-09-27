@@ -1,8 +1,6 @@
 package com.covidtrail.covidtrailbackend.repository;
 
-import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
-import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogDto;
-import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
+import com.covidtrail.covidtrailbackend.dto.*;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +34,7 @@ public class PlacesVisitedLogService {
         String sql = "" +
                 " SELECT DISTINCT" +
                 "     ID," +
+                "     CONVERT(DATE, VISITED_DATETIME)," +
                 "     VISITED_DATETIME," +
                 "     USERACCOUNT_ID," +
                 "     BUSINESSACCOUNT_ID" +
@@ -57,6 +57,7 @@ public class PlacesVisitedLogService {
         String sql = "" +
                 " SELECT DISTINCT" +
                 "     ID," +
+                "     CONVERT(DATE, VISITED_DATETIME)," +
                 "     VISITED_DATETIME," +
                 "     USERACCOUNT_ID," +
                 "     BUSINESSACCOUNT_ID" +
@@ -77,10 +78,11 @@ public class PlacesVisitedLogService {
      *
      * @return list of places visited logs
      */
-    public List<PlacesVisitedLogDto> getPlacesVisitedLogsByUserId(int userId) {
+    public List<PlacesVisitedLogBusinessDto> getPlacesVisitedLogsByUserId(int userId) {
         String sql = "" +
                 " SELECT DISTINCT" +
                 "     ID," +
+                "     CONVERT(DATE, VISITED_DATETIME)," +
                 "     VISITED_DATETIME," +
                 "     USERACCOUNT_ID," +
                 "     BUSINESSACCOUNT_ID" +
@@ -93,8 +95,59 @@ public class PlacesVisitedLogService {
 
         query.setParameter("userId", userId);
 
-        return (List<PlacesVisitedLogDto>) query.getResultList().stream()
+        List<PlacesVisitedLogDto> queryResult = (List<PlacesVisitedLogDto>) query.getResultList().stream()
                 .map(this::mapToPlacesVisitedLog).collect(Collectors.toList());
+
+        List<PlacesVisitedLogBusinessDto> result = new ArrayList<>();
+        List<PlacesVisitedLogBusinessDatailsDto> businessDetailsDtoList;
+        PlacesVisitedLogBusinessDatailsDto businessDetailsTemp;
+
+        for (PlacesVisitedLogDto dto : queryResult) {
+            Date visitedDate = dto.getVisitedDate();
+            int i = 0;
+
+            PlacesVisitedLogBusinessDto temp = null;
+
+            for (PlacesVisitedLogBusinessDto d : result) {
+                if (d.getVisitedDate().equals(visitedDate)) {
+                    temp = d;
+                    break;
+                }
+
+                i++;
+            }
+
+            if (temp == null) {
+                temp = new PlacesVisitedLogBusinessDto();
+                businessDetailsDtoList = new ArrayList<>();
+                businessDetailsTemp = new PlacesVisitedLogBusinessDatailsDto();
+
+                businessDetailsTemp.setId(dto.getId());
+                businessDetailsTemp.setVisitedDateTime(dto.getVisitedDateTime());
+                businessDetailsTemp.setBusinessAccount(dto.getBusinessAccount());
+                businessDetailsDtoList.add(businessDetailsTemp);
+
+                temp.setVisitedDate(visitedDate);
+                temp.setBusinessDetails(businessDetailsDtoList);
+
+                result.add(temp);
+            } else {
+                businessDetailsDtoList = temp.getBusinessDetails();
+                businessDetailsTemp = new PlacesVisitedLogBusinessDatailsDto();
+
+                businessDetailsTemp.setId(dto.getId());
+                businessDetailsTemp.setVisitedDateTime(dto.getVisitedDateTime());
+                businessDetailsTemp.setBusinessAccount(dto.getBusinessAccount());
+                businessDetailsDtoList.add(businessDetailsTemp);
+
+                temp.setVisitedDate(visitedDate);
+                temp.setBusinessDetails(businessDetailsDtoList);
+
+                result.set(i, temp);
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -102,10 +155,11 @@ public class PlacesVisitedLogService {
      *
      * @return list of places visited logs
      */
-    public List<PlacesVisitedLogDto> getPlacesVisitedLogsByBusinessId(int businessId) {
+    public List<PlacesVisitedLogUserDto> getPlacesVisitedLogsByBusinessId(int businessId) {
         String sql = "" +
                 " SELECT DISTINCT" +
                 "     ID," +
+                "     CONVERT(DATE, VISITED_DATETIME)," +
                 "     VISITED_DATETIME," +
                 "     USERACCOUNT_ID," +
                 "     BUSINESSACCOUNT_ID" +
@@ -118,8 +172,65 @@ public class PlacesVisitedLogService {
 
         query.setParameter("businessId", businessId);
 
-        return (List<PlacesVisitedLogDto>) query.getResultList().stream()
+        List<PlacesVisitedLogDto> queryResult = (List<PlacesVisitedLogDto>) query.getResultList().stream()
                 .map(this::mapToPlacesVisitedLog).collect(Collectors.toList());
+
+        List<PlacesVisitedLogUserDto> result = new ArrayList<>();
+        List<PlacesVisitedLogUserDetailsDto> userDetailsDtoList;
+        PlacesVisitedLogUserDetailsDto userDetailsTemp;
+
+        for (PlacesVisitedLogDto dto : queryResult) {
+            Date visitedDate = dto.getVisitedDate();
+            int i = 0;
+
+            PlacesVisitedLogUserDto temp = null;
+
+            for (PlacesVisitedLogUserDto d : result) {
+                if (d.getVisitedDate().equals(visitedDate)) {
+                    temp = d;
+                    break;
+                }
+
+                i++;
+            }
+
+            if (temp == null) {
+                temp = new PlacesVisitedLogUserDto();
+                userDetailsDtoList = new ArrayList<>();
+                userDetailsTemp = new PlacesVisitedLogUserDetailsDto();
+
+                userDetailsTemp.setId(dto.getId());
+                userDetailsTemp.setVisitedDateTime(dto.getVisitedDateTime());
+                userDetailsTemp.setUserId(dto.getUserAccount().getId());
+                userDetailsTemp.setFirstName(dto.getUserAccount().getFirstName());
+                userDetailsTemp.setMiddleName(dto.getUserAccount().getMiddleName());
+                userDetailsTemp.setLastName(dto.getUserAccount().getLastName());
+                userDetailsDtoList.add(userDetailsTemp);
+
+                temp.setVisitedDate(visitedDate);
+                temp.setUserDetails(userDetailsDtoList);
+
+                result.add(temp);
+            } else {
+                userDetailsDtoList = temp.getUserDetails();
+                userDetailsTemp = new PlacesVisitedLogUserDetailsDto();
+
+                userDetailsTemp.setId(dto.getId());
+                userDetailsTemp.setVisitedDateTime(dto.getVisitedDateTime());
+                userDetailsTemp.setUserId(dto.getUserAccount().getId());
+                userDetailsTemp.setFirstName(dto.getUserAccount().getFirstName());
+                userDetailsTemp.setMiddleName(dto.getUserAccount().getMiddleName());
+                userDetailsTemp.setLastName(dto.getUserAccount().getLastName());
+                userDetailsDtoList.add(userDetailsTemp);
+
+                temp.setVisitedDate(visitedDate);
+                temp.setUserDetails(userDetailsDtoList);
+
+                result.set(i, temp);
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -167,9 +278,10 @@ public class PlacesVisitedLogService {
         PlacesVisitedLogDto placesVisitedLogDto = new PlacesVisitedLogDto();
 
         placesVisitedLogDto.setId(Integer.parseInt(val[0].toString()));
-        placesVisitedLogDto.setVisitedDateTime((Date) val[1]);
-        placesVisitedLogDto.setUserAccount(userAccountService.getUserAccountById(Integer.parseInt(val[2].toString())));
-        placesVisitedLogDto.setBusinessAccount(businessAccountService.getBusinessAccountById(Integer.parseInt(val[3].toString())));
+        placesVisitedLogDto.setVisitedDate((Date) val[1]);
+        placesVisitedLogDto.setVisitedDateTime((Date) val[2]);
+        placesVisitedLogDto.setUserAccount(userAccountService.getUserAccountById(Integer.parseInt(val[3].toString())));
+        placesVisitedLogDto.setBusinessAccount(businessAccountService.getBusinessAccountById(Integer.parseInt(val[4].toString())));
 
         return placesVisitedLogDto;
     }

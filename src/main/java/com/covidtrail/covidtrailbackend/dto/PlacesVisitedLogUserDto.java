@@ -5,14 +5,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class PlacesVisitedLogDto {
-    private int id;
+public class PlacesVisitedLogUserDto {
     private Date visitedDate;
-    private Date visitedDateTime;
-    private UserAccountDto userAccount;
-    private BusinessAccountDto businessAccount;
+    private List<PlacesVisitedLogUserDetailsDto> userDetails;
 }

@@ -9,10 +9,8 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PlacesVisitedLogDto {
+public class PlacesVisitedLogBusinessDatailsDto {
     private int id;
-    private Date visitedDate;
     private Date visitedDateTime;
-    private UserAccountDto userAccount;
     private BusinessAccountDto businessAccount;
 }
