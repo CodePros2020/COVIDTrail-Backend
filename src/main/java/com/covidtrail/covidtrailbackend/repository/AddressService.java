@@ -1,19 +1,23 @@
 package com.covidtrail.covidtrailbackend.repository;
 
 import com.covidtrail.covidtrailbackend.dto.AddressDto;
-import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.util.stream.Collectors;
 
 @Service
 public class AddressService {
     @Autowired
     protected EntityManager manager;
 
+    /**
+     * Get address by id
+     *
+     * @param - address id
+     * @return Account Details
+     */
     public AddressDto getAddressById(int id) {
         String sql = "" +
                 " SELECT DISTINCT" +

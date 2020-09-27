@@ -21,7 +21,6 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
 	@Bean
 	public UserDetailsService userDetailsService() {
 		return new UserDetailsServiceImpl();
@@ -39,7 +38,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-
         String[] noAuthPaths = {
                 "/swagger-ui.html",
                 "/v2/api-docs",
@@ -72,7 +70,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
 
         http.exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPoint() {
-
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response,
                                  AuthenticationException authException) throws IOException, ServletException {
@@ -80,9 +77,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 response.sendError(403, "Forbidden");
             }
         });
-
-
     }
-
-
 }

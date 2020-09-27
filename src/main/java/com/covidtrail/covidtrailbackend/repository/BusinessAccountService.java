@@ -237,6 +237,12 @@ public class BusinessAccountService {
 		return String.format("Business %s with id %d deleted successfully.", businessAccount.getBusinessName(), id);
 	}
 
+	/**
+	 * Create Business Account
+	 *
+	 * @param dto - BusinessAccountCreateDto
+	 * @return - string message
+	 */
 	@Transactional
 	public String createBusinessAccount(BusinessAccountCreateDto dto) {
 

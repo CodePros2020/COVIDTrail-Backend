@@ -11,7 +11,6 @@ import com.covidtrail.covidtrailbackend.model.CustomUser;
 @Component
 @Scope(scopeName = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class SessionInfo {
-
 	public CustomUser getCurrentUser() {
 		SecurityContext securityContext = SecurityContextHolder.getContext();
 		CustomUser user = null;
@@ -20,5 +19,4 @@ public class SessionInfo {
 		}	
 		return user;
 	}
-
 }

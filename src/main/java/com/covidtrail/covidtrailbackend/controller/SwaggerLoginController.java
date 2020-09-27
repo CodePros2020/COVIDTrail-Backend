@@ -1,5 +1,6 @@
 package com.covidtrail.covidtrailbackend.controller;
 
+import com.covidtrail.covidtrailbackend.dto.AccountDetailsDto;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,10 +14,9 @@ import io.swagger.annotations.ApiParam;
 @RequestMapping("")
 @Api(tags = { "Swagger Auth" })
 public class SwaggerLoginController {
-
 	@ApiOperation("Login.")
 	@PostMapping("/login")
-	public void swaggerLogin(@ApiParam("username") @RequestParam String username, @ApiParam("password") @RequestParam String password) {
+	public AccountDetailsDto swaggerLogin(@ApiParam("username") @RequestParam String username, @ApiParam("password") @RequestParam String password) {
 	    throw new IllegalStateException("This method shouldn't be called. It's implemented by Spring Security filters.");
 	}
 
@@ -25,5 +25,4 @@ public class SwaggerLoginController {
 	public void swaggerLogout() {
 	    throw new IllegalStateException("This method shouldn't be called. It's implemented by Spring Security filters.");
 	}
-	
 }

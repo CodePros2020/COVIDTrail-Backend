@@ -2,6 +2,9 @@ package com.covidtrail.covidtrailbackend.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.covidtrail.covidtrailbackend.dto.AccountDetailsDto;
+import com.covidtrail.covidtrailbackend.repository.AuthenticationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,14 +20,16 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping("/api/authentication")
 @Api(tags = { "Authentication" })
 public class AuthenticationController {
+	@Autowired
+	protected AuthenticationService authenticationService;
 
 	@GetMapping("/success")
     @ApiOperation(value = "Logged in the user successfully.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public String success() throws Exception {
-        return "success";
+    public AccountDetailsDto success() throws Exception {
+        return authenticationService.getLoggedInUserDetails();
     }
 
 	@RequestMapping(value="/login", method = RequestMethod.GET)
