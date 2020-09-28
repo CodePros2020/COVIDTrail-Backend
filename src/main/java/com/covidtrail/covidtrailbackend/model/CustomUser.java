@@ -22,6 +22,13 @@ public class CustomUser extends User {
 	private String lastName;
 	private int deleted;
 	private String businessName;
+	private String email;
+	private String addressLineOne;
+	private String addressLineTwo;
+	private String province;
+	private String postalCode;
+	private String city;
+	private String middleName;
 	
 	public CustomUser(int id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
 		super(username, password, authorities);
@@ -38,6 +45,13 @@ public class CustomUser extends User {
 		this.firstName = builder.getFirstName();
 		this.lastName = builder.getLastName();
 		this.businessName = builder.getBusinessName();
+		this.email = builder.getEmail();
+		this.addressLineOne = builder.getAddressLineOne();
+		this.addressLineTwo = builder.getAddressLineTwo();
+		this.province = builder.getProvince();
+		this.postalCode = builder.getPostalCode();
+		this.city = builder.getCity();
+		this.middleName = builder.getMiddleName();
 	}
 	
 }

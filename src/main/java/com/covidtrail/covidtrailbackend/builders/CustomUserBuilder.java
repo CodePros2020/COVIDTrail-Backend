@@ -13,6 +13,13 @@ public class CustomUserBuilder {
 	private String firstName;
 	private String lastName;
 	private String businessName;
+	private String email;
+	private String addressLineOne;
+	private String addressLineTwo;
+	private String province;
+	private String postalCode;
+	private String city;
+	private String middleName;
 
 	public CustomUserBuilder id(int id) {
 		this.id = id;
@@ -44,6 +51,41 @@ public class CustomUserBuilder {
 		return this;
 	}
 
+	public CustomUserBuilder email(String email) {
+		this.email = email;
+		return this;
+	}
+	
+	public CustomUserBuilder addressLineOne(String addressLineOne) {
+		this.addressLineOne = addressLineOne;
+		return this;
+	}
+	
+	public CustomUserBuilder addressLineTwo(String addressLineTwo) {
+		this.addressLineTwo = addressLineTwo;
+		return this;
+	}
+	
+	public CustomUserBuilder province(String province) {
+		this.province = province;
+		return this;
+	}
+	
+	public CustomUserBuilder postalCode(String postalCode) {
+		this.postalCode = postalCode;
+		return this;
+	}
+	
+	public CustomUserBuilder city(String city) {
+		this.city = city;
+		return this;
+	}
+	
+	public CustomUserBuilder middleName(String middleName) {
+		this.middleName = middleName;
+		return this;
+	}
+	
 	public CustomUser build() {
 		return new CustomUser(this);
 	}

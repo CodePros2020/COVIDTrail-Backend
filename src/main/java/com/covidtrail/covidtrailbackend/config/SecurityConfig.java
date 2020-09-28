@@ -70,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.authorizeRequests()
 			.anyRequest().authenticated()
 			.and()
-			.formLogin().successHandler(this::loginSuccessHandler).permitAll()
+			.formLogin().permitAll().successHandler(this::loginSuccessHandler)
 			.and()
 			.logout()
 			.logoutSuccessUrl("/api/authentication/logoutSuccess")
@@ -97,6 +97,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		accountDetails.setLastName(customUser.getLastName());
 		accountDetails.setBusinessName(customUser.getBusinessName());
 		accountDetails.setId(customUser.getId());
+		accountDetails.setPhone(customUser.getUsername());
+		accountDetails.setEmail(customUser.getEmail());
+		accountDetails.setAddressLineOne(customUser.getAddressLineOne());
+		accountDetails.setAddressLineTwo(customUser.getAddressLineTwo());
+		accountDetails.setCity(customUser.getCity());
+		accountDetails.setProvince(customUser.getProvince());
+		accountDetails.setPostalCode(customUser.getPostalCode());
 		
 		response.setStatus(HttpStatus.OK.value());
 		objectMapper.writeValue(response.getWriter(), accountDetails);

@@ -22,10 +22,11 @@ public class CustomUserService {
 	 */
 	public CustomUser findUserAccountByUserName(String username) {
 		StringBuilder  sql = new StringBuilder();
-		sql.append("SELECT ID, PHONE, PASSWORD, FIRSTNAME, LASTNAME \n");
-		sql.append("	FROM USERACCOUNT \n");
-		sql.append("	WHERE PHONE = :userName");
-		sql.append("	AND DELETED = 0");
+		sql.append("SELECT U.ID, U.PHONE, U.PASSWORD, U.FIRSTNAME, U.LASTNAME, U.EMAIL, "
+				+ "A.ADDRESS_LINE_ONE, A.ADDRESS_LINE_TWO, A.PROVINCE, A.POSTAL_CODE, A.CITY, U.MIDDLENAME \n");
+		sql.append("	FROM USERACCOUNT U JOIN ADDRESS A ON A.ID = U.ADDRESS_ID \n");
+		sql.append("	WHERE U.PHONE = :userName");
+		sql.append("	AND U.DELETED = 0");
 
 		Query query = manager.createNativeQuery(sql.toString());
         query.setParameter("userName", username);
@@ -38,7 +39,14 @@ public class CustomUserService {
         			.phone((String) val[1])
         			.password((String) val[2])
         			.firstName((String) val[3])
-        			.lastName((String) val[4]));
+        			.lastName((String) val[4])
+		        	.email((String) val[5])
+		        	.addressLineOne((String) val[6])
+		        	.addressLineTwo((String) val[7])
+		        	.province((String) val[8])
+		        	.postalCode((String) val[9])
+		        	.city((String) val[10])
+		        	.middleName((String) val[11]));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -54,10 +62,11 @@ public class CustomUserService {
 	 */
 	public CustomUser findBusinessAccountByUserName(String username) {
 		StringBuilder  sql = new StringBuilder();
-		sql.append("SELECT ID, PHONE, PASSWORD, BUSINESSNAME \n");
-		sql.append("	FROM BUSINESSACCOUNT \n");
-		sql.append("	WHERE PHONE = :userName");
-		sql.append("	AND DELETED = 0");
+		sql.append("SELECT B.ID, B.PHONE, B.PASSWORD, B.BUSINESSNAME, B.EMAIL, ");
+		sql.append("A.ADDRESS_LINE_ONE, A.ADDRESS_LINE_TWO, A.PROVINCE, A.POSTAL_CODE, A.CITY \n");
+		sql.append("	FROM BUSINESSACCOUNT B JOIN ADDRESS A ON A.ID = B.ADDRESS_ID \n");
+		sql.append("	WHERE B.PHONE = :userName");
+		sql.append("	AND B.DELETED = 0");
 		
 		Query query = manager.createNativeQuery(sql.toString());
 		query.setParameter("userName", username);
@@ -69,7 +78,13 @@ public class CustomUserService {
 					.id((Integer) val[0])
 					.phone((String) val[1])
 					.password((String) val[2])
-					.businessName((String) val[3]));
+					.businessName((String) val[3])
+					.email((String) val[4])
+		        	.addressLineOne((String) val[5])
+		        	.addressLineTwo((String) val[6])
+		        	.province((String) val[7])
+		        	.postalCode((String) val[8])
+		        	.city((String) val[9]));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
