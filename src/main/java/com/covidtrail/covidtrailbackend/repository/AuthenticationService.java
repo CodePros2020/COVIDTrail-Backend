@@ -28,7 +28,7 @@ public class AuthenticationService {
         String sql;
 
         Boolean isBusiness = false;
-        
+
         if (user.getBusinessName() == null) {
             sql = "" +
                     " SELECT DISTINCT" +
@@ -50,9 +50,9 @@ public class AuthenticationService {
                     "     AND u.DELETED = 0" +
                     " ORDER BY u.ID DESC";
         } else {
-        	
-        	isBusiness = true;
-        	
+
+            isBusiness = true;
+
             sql = "" +
                     " SELECT DISTINCT" +
                     "     b.ID," +
@@ -75,12 +75,12 @@ public class AuthenticationService {
         query.setParameter("phone", user.getUsername());
 
         Object obj = query.getSingleResult();
-        
+
         if (isBusiness) {
-			return mapToBusinessAccountDetailsDto(obj);
-		} else {
-			return mapToUserAccountDetailsDto(obj);
-		}
+            return mapToBusinessAccountDetailsDto(obj);
+        } else {
+            return mapToUserAccountDetailsDto(obj);
+        }
     }
 
     /**
@@ -107,7 +107,7 @@ public class AuthenticationService {
 
         return accountDetails;
     }
-    
+
     /**
      * Map object to Business Account Details Object
      *
@@ -115,19 +115,32 @@ public class AuthenticationService {
      * @return Account Details
      */
     private AccountDetailsDto mapToBusinessAccountDetailsDto(Object obj) {
-    	Object[] val = (Object[]) obj;
-    	AccountDetailsDto accountDetails = new AccountDetailsDto();
-    	
-    	accountDetails.setId(Integer.parseInt(val[0].toString()));
-    	accountDetails.setBusinessName((String) val[1]);
-    	accountDetails.setAddressLineOne((String) val[2]);
-    	accountDetails.setAddressLineTwo((String) val[3]);
-    	accountDetails.setCity((String) val[4]);
-    	accountDetails.setProvince((String) val[5]);
-    	accountDetails.setPostalCode((String) val[6]);
-    	accountDetails.setEmail((String) val[7]);
-    	accountDetails.setPhone((String) val[8]);
-    	
-    	return accountDetails;
+        Object[] val = (Object[]) obj;
+        AccountDetailsDto accountDetails = new AccountDetailsDto();
+
+        accountDetails.setId(Integer.parseInt(val[0].toString()));
+        accountDetails.setBusinessName((String) val[1]);
+        accountDetails.setAddressLineOne((String) val[2]);
+        accountDetails.setAddressLineTwo((String) val[3]);
+        accountDetails.setCity((String) val[4]);
+        accountDetails.setProvince((String) val[5]);
+        accountDetails.setPostalCode((String) val[6]);
+        accountDetails.setEmail((String) val[7]);
+        accountDetails.setPhone((String) val[8]);
+
+        return accountDetails;
+    }
+
+    public AccountDetailsDto getAccountDetails() {
+        CustomUser user = sessionInfo.getCurrentUser();
+
+        AccountDetailsDto result = new AccountDetailsDto();
+
+        result.setId(user.getId());
+        result.setBusinessName(user.getBusinessName());
+        result.setFirstName(user.getFirstName());
+        result.setLastName(user.getLastName());
+
+        return result;
     }
 }

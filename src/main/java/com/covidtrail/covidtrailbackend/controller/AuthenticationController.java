@@ -31,6 +31,15 @@ public class AuthenticationController {
     public AccountDetailsDto success() throws Exception {
         return authenticationService.getLoggedInUserDetails();
     }
+
+	@GetMapping("/getUserDetails")
+	@ApiOperation(value = "Logged in the user successfully.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 500, message = "Unexpected error")})
+	public AccountDetailsDto getUserDetails() {
+		return authenticationService.getAccountDetails();
+	}
 	
 	@GetMapping("/logoutSuccess")
 	@ApiOperation(value = "Logged in the user successfully.")
