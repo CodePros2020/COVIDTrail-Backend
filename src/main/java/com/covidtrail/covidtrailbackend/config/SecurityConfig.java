@@ -6,21 +6,33 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+
+import com.covidtrail.covidtrailbackend.dto.AccountDetailsDto;
+import com.covidtrail.covidtrailbackend.model.CustomUser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+	private ObjectMapper objectMapper = new ObjectMapper();
+
+	@Autowired
+	protected SessionInfo sessionInfo;
+	
 	@Bean
 	public UserDetailsService userDetailsService() {
 		return new UserDetailsServiceImpl();
@@ -38,45 +50,55 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-        String[] noAuthPaths = {
-                "/swagger-ui.html",
-                "/v2/api-docs",
-                "/configuration/ui/**",
-                "/swagger-resources/**",
-                "/configuration/security/**",
-                "/swagger-ui.html",
-                "/webjars/**",
-                "/api/authentication/success",
-                "/api/businessAccount/create",
-                "/api/userAccount/create"};
+		String[] noAuthPaths = {
+				"/swagger-ui.html",
+				"/v2/api-docs",
+				"/configuration/ui/**",
+				"/swagger-resources/**",
+				"/configuration/security/**",
+				"/swagger-ui.html",
+				"/webjars/**",
+				"/api/authentication/success",
+				"/api/businessAccount/create",
+		"/api/userAccount/create"};
 
-        SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
-        successHandler.setTargetUrlParameter("redirectTo");
-        successHandler.setDefaultTargetUrl("/api/authentication/success");
-        successHandler.setAlwaysUseDefaultTargetUrl(true);
+		http.cors();
+		http.csrf().disable()
+			.authorizeRequests()
+			.antMatchers(noAuthPaths).permitAll()
+			.and()
+			.authorizeRequests()
+			.anyRequest().authenticated()
+			.and()
+			.formLogin().successHandler(this::loginSuccessHandler).permitAll()
+			.and()
+			.logout()
+			.logoutSuccessUrl("/api/authentication/logoutSuccess")
+			.permitAll();
 
-        http.cors();
-        http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers(noAuthPaths).permitAll()
-                .and()
-                .authorizeRequests()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().permitAll()
-                .successHandler(successHandler)
-                .and()
-                .logout()
-                .logoutSuccessUrl("/api/authentication/logoutSuccess")
-                .permitAll();
+		http.exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPoint() {
+			@Override
+			public void commence(HttpServletRequest request, HttpServletResponse response,
+					AuthenticationException authException) throws IOException, ServletException {
+				response.isCommitted();
+				response.sendError(403, "Forbidden");
+			}
+		});
+	}
 
-        http.exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPoint() {
-            @Override
-            public void commence(HttpServletRequest request, HttpServletResponse response,
-                                 AuthenticationException authException) throws IOException, ServletException {
-                response.isCommitted();
-                response.sendError(403, "Forbidden");
-            }
-        });
-    }
+	private void loginSuccessHandler(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Authentication authentication) throws IOException {
+
+		CustomUser customUser = sessionInfo.getCurrentUser();
+		AccountDetailsDto accountDetails = new AccountDetailsDto();
+		accountDetails.setFirstName(customUser.getFirstName());
+		accountDetails.setLastName(customUser.getLastName());
+		accountDetails.setBusinessName(customUser.getBusinessName());
+		accountDetails.setId(customUser.getId());
+		
+		response.setStatus(HttpStatus.OK.value());
+		objectMapper.writeValue(response.getWriter(), accountDetails);
+	}
 }
