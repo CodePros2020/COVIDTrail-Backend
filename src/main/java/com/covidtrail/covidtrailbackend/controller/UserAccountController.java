@@ -84,13 +84,13 @@ public class UserAccountController {
     }
 
     @PutMapping("/{id}/phone")
-    @ApiOperation(value = "Update an user's email address with id.")
+    @ApiOperation(value = "Update an user's phone address with id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public String updateUserPhoneById(@PathVariable int id, @RequestParam String newPhone) throws Exception {
+    public String updateUserPhoneById(@PathVariable int id, @RequestParam String newPhone, @RequestParam String password) throws Exception {
         try {
-            return userAccountService.updateUserPhoneById(id, newPhone);
+            return userAccountService.updateUserPhoneById(id, newPhone, password);
         } catch (Exception e) {
             return e.getMessage();
         }

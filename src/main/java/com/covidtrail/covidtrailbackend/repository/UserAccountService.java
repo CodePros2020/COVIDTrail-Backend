@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.covidtrail.covidtrailbackend.config.SessionInfo;
 import com.covidtrail.covidtrailbackend.dto.AddressCreateDto;
 import com.covidtrail.covidtrailbackend.dto.AddressDto;
 import com.covidtrail.covidtrailbackend.dto.UserAccountCreateDto;
@@ -33,6 +34,9 @@ public class UserAccountService {
 
     @Autowired
     protected PhoneService phoneService;
+    
+    @Autowired
+    protected SessionInfo sessionInfo;
 
     /**
      * Get the list of all user accounts
@@ -174,7 +178,7 @@ public class UserAccountService {
      * @throws Exception when id not found or user account not found
      */
     @Transactional
-    public String updateUserPhoneById(int id, String newPhone) throws Exception {
+    public String updateUserPhoneById(int id, String newPhone, String password) throws Exception {
 
         boolean isDuplicated = phoneService.findDuplicatedPhones(newPhone);
 
@@ -188,16 +192,26 @@ public class UserAccountService {
             throw new NotFoundException("User account not found with the id " + id);
         }
 
+        String encryptedPasswordDb = sessionInfo.getCurrentUser().getPassword(); 
+        Boolean isCorrectPassword = new BCryptPasswordEncoder().matches(password, encryptedPasswordDb);
+        
+        if (!isCorrectPassword) {
+			throw new IllegalArgumentException("Please provide a valid password.");
+		}
+        
+        String token = TokenUtil.generateBy(newPhone, password);
+        
         String sql = "" +
                 " UPDATE USERACCOUNT" +
                 " SET LAST_MODIFIED_DATETIME = GETDATE()," +
-                "     PHONE = :newPhone" +
+                "     PHONE = :newPhone, TOKEN = :token" +
                 " WHERE ID = :id" +
                 "     AND DELETED = 0";
 
         Query query = manager.createNativeQuery(sql);
 
         query.setParameter("newPhone", newPhone);
+        query.setParameter("token", token);
         query.setParameter("id", id);
 
         query.executeUpdate();
