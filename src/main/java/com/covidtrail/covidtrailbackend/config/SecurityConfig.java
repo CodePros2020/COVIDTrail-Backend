@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -60,12 +61,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				"/webjars/**",
 				"/api/authentication/success",
 				"/api/businessAccount/create",
-		"/api/userAccount/create"};
+				"/api/userAccount/create"};
 
 		http.cors();
 		http.csrf().disable()
 			.authorizeRequests()
 			.antMatchers(noAuthPaths).permitAll()
+			.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 			.and()
 			.authorizeRequests()
 			.anyRequest().authenticated()
@@ -74,7 +76,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 			.logout()
 			.logoutSuccessUrl("/api/authentication/logoutSuccess")
-			.permitAll();
+			.permitAll()
+			.and()
+			.httpBasic();
 
 		http.exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPoint() {
 			@Override
@@ -104,6 +108,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		accountDetails.setCity(customUser.getCity());
 		accountDetails.setProvince(customUser.getProvince());
 		accountDetails.setPostalCode(customUser.getPostalCode());
+		accountDetails.setToken(customUser.getToken());
 		
 		response.setStatus(HttpStatus.OK.value());
 		objectMapper.writeValue(response.getWriter(), accountDetails);

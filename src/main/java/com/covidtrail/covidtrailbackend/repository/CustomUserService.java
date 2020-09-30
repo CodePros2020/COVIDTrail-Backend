@@ -23,7 +23,7 @@ public class CustomUserService {
 	public CustomUser findUserAccountByUserName(String username) {
 		StringBuilder  sql = new StringBuilder();
 		sql.append("SELECT U.ID, U.PHONE, U.PASSWORD, U.FIRSTNAME, U.LASTNAME, U.EMAIL, "
-				+ "A.ADDRESS_LINE_ONE, A.ADDRESS_LINE_TWO, A.PROVINCE, A.POSTAL_CODE, A.CITY, U.MIDDLENAME \n");
+				+ "A.ADDRESS_LINE_ONE, A.ADDRESS_LINE_TWO, A.PROVINCE, A.POSTAL_CODE, A.CITY, U.MIDDLENAME, U.TOKEN \n");
 		sql.append("	FROM USERACCOUNT U JOIN ADDRESS A ON A.ID = U.ADDRESS_ID \n");
 		sql.append("	WHERE U.PHONE = :userName");
 		sql.append("	AND U.DELETED = 0");
@@ -46,7 +46,8 @@ public class CustomUserService {
 		        	.province((String) val[8])
 		        	.postalCode((String) val[9])
 		        	.city((String) val[10])
-		        	.middleName((String) val[11]));
+		        	.middleName((String) val[11])
+        			.token((String) val[12]));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -63,7 +64,7 @@ public class CustomUserService {
 	public CustomUser findBusinessAccountByUserName(String username) {
 		StringBuilder  sql = new StringBuilder();
 		sql.append("SELECT B.ID, B.PHONE, B.PASSWORD, B.BUSINESSNAME, B.EMAIL, ");
-		sql.append("A.ADDRESS_LINE_ONE, A.ADDRESS_LINE_TWO, A.PROVINCE, A.POSTAL_CODE, A.CITY \n");
+		sql.append("A.ADDRESS_LINE_ONE, A.ADDRESS_LINE_TWO, A.PROVINCE, A.POSTAL_CODE, A.CITY, B.TOKEN \n");
 		sql.append("	FROM BUSINESSACCOUNT B JOIN ADDRESS A ON A.ID = B.ADDRESS_ID \n");
 		sql.append("	WHERE B.PHONE = :userName");
 		sql.append("	AND B.DELETED = 0");
@@ -84,7 +85,8 @@ public class CustomUserService {
 		        	.addressLineTwo((String) val[6])
 		        	.province((String) val[7])
 		        	.postalCode((String) val[8])
-		        	.city((String) val[9]));
+		        	.city((String) val[9])
+		        	.token((String) val[10]));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

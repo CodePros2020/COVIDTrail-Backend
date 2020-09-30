@@ -18,6 +18,7 @@ import com.covidtrail.covidtrailbackend.dto.UserAccountCreateDto;
 import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
 import com.covidtrail.covidtrailbackend.dto.UserAccountNameUpdateDto;
 import com.covidtrail.covidtrailbackend.model.PhoneService;
+import com.covidtrail.covidtrailbackend.utils.TokenUtil;
 
 import javassist.NotFoundException;
 
@@ -285,8 +286,8 @@ public class UserAccountService {
         System.out.println(lastAddressId);
 
         StringBuilder sqlUserAccount = new StringBuilder();
-        sqlUserAccount.append("INSERT into USERACCOUNT(CREATED_DATETIME, DELETED, FIRSTNAME, MIDDLENAME, LASTNAME, ADDRESS_ID, EMAIL, PHONE, PASSWORD) \n");
-        sqlUserAccount.append(" VALUES (GETDATE(), 0, :firstName, :middleName, :lastName, :addressId, :email, :phone, :password) ");
+        sqlUserAccount.append("INSERT into USERACCOUNT(CREATED_DATETIME, DELETED, FIRSTNAME, MIDDLENAME, LASTNAME, ADDRESS_ID, EMAIL, PHONE, PASSWORD, TOKEN) \n");
+        sqlUserAccount.append(" VALUES (GETDATE(), 0, :firstName, :middleName, :lastName, :addressId, :email, :phone, :password, :token) ");
 
         query = manager.createNativeQuery(sqlUserAccount.toString());
 
@@ -295,8 +296,13 @@ public class UserAccountService {
         query.setParameter("lastName", dto.getLastName());
         query.setParameter("addressId", lastAddressId);
         query.setParameter("email", dto.getEmail());
-        query.setParameter("phone", dto.getPhone());
-        query.setParameter("password", new BCryptPasswordEncoder().encode(dto.getPassword()));
+        
+        String phone = dto.getPhone();
+        String password = dto.getPassword();
+        
+		query.setParameter("phone", phone);
+		query.setParameter("password", new BCryptPasswordEncoder().encode(password));
+        query.setParameter("token", TokenUtil.generateBy(phone, password));
 
         query.executeUpdate();
 
@@ -323,4 +329,5 @@ public class UserAccountService {
 
         return userAccount;
     }
+    
 }

@@ -56,12 +56,12 @@ public class BusinessAccountController {
         return businessAccountService.createBusinessAccount(dto);
     }
 
-    @PutMapping("/{id}/name")
+    @PutMapping("/{id}/name/{newName}")
     @ApiOperation(value = "Update an business names with id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public String updateUserNamesById(@PathVariable int id, @RequestParam String newName) throws Exception {
+    public String updateUserNamesById(@PathVariable int id, @PathVariable String newName) throws Exception {
         try {
             return businessAccountService.updateBusinessNamesById(id, newName);
         } catch (Exception e) {

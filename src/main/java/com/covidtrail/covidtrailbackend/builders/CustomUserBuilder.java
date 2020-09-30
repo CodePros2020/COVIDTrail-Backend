@@ -20,6 +20,7 @@ public class CustomUserBuilder {
 	private String postalCode;
 	private String city;
 	private String middleName;
+	private String token;
 
 	public CustomUserBuilder id(int id) {
 		this.id = id;
@@ -83,6 +84,11 @@ public class CustomUserBuilder {
 	
 	public CustomUserBuilder middleName(String middleName) {
 		this.middleName = middleName;
+		return this;
+	}
+	
+	public CustomUserBuilder token(String token) {
+		this.token = token;
 		return this;
 	}
 	

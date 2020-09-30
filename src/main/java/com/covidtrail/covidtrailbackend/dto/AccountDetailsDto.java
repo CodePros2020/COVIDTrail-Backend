@@ -20,4 +20,5 @@ public class AccountDetailsDto {
     private String postalCode;
     private String email;
     private String phone;
+    private String token;
 }

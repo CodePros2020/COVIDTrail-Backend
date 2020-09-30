@@ -16,4 +16,5 @@ public class CovidtrailbackendApplication {
 		
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 	}
+	
 }

@@ -16,6 +16,7 @@ import com.covidtrail.covidtrailbackend.dto.AddressDto;
 import com.covidtrail.covidtrailbackend.dto.BusinessAccountCreateDto;
 import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
 import com.covidtrail.covidtrailbackend.model.PhoneService;
+import com.covidtrail.covidtrailbackend.utils.TokenUtil;
 
 import javassist.NotFoundException;
 
@@ -271,16 +272,21 @@ public class BusinessAccountService {
 		System.out.println(lastAddressId);
 
 		StringBuilder sqlUserAccount = new StringBuilder();
-		sqlUserAccount.append("INSERT into BUSINESSACCOUNT(CREATED_DATETIME, DELETED, BUSINESSNAME, ADDRESS_ID, EMAIL, PHONE, PASSWORD) \n");
-		sqlUserAccount.append(" VALUES (GETDATE(), 0, :businessName, :addressId, :email, :phone, :password) ");
+		sqlUserAccount.append("INSERT into BUSINESSACCOUNT(CREATED_DATETIME, DELETED, BUSINESSNAME, ADDRESS_ID, EMAIL, PHONE, PASSWORD, TOKEN) \n");
+		sqlUserAccount.append(" VALUES (GETDATE(), 0, :businessName, :addressId, :email, :phone, :password, :token) ");
 
 		query = manager.createNativeQuery(sqlUserAccount.toString());
 
 		query.setParameter("businessName", dto.getBusinessName());
 		query.setParameter("addressId", lastAddressId);
 		query.setParameter("email", dto.getEmail());
-		query.setParameter("phone", dto.getPhone());
-		query.setParameter("password", new BCryptPasswordEncoder().encode(dto.getPassword()));
+		
+		String phone = dto.getPhone();
+        String password = dto.getPassword();
+        
+		query.setParameter("phone", phone);
+		query.setParameter("password", new BCryptPasswordEncoder().encode(password));
+        query.setParameter("token", TokenUtil.generateBy(phone, password));
 
 		query.executeUpdate();
 

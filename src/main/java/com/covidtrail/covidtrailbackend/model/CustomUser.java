@@ -29,6 +29,7 @@ public class CustomUser extends User {
 	private String postalCode;
 	private String city;
 	private String middleName;
+	private String token;
 	
 	public CustomUser(int id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
 		super(username, password, authorities);
@@ -52,6 +53,7 @@ public class CustomUser extends User {
 		this.postalCode = builder.getPostalCode();
 		this.city = builder.getCity();
 		this.middleName = builder.getMiddleName();
+		this.token = builder.getToken();
 	}
 	
 }
