@@ -66,8 +66,7 @@ public class BusinessAccountService {
 
         query.setParameter("id", id);
 
-        return (BusinessAccountDto) query.getResultList().stream()
-                .map(this::mapToBusinessAccount).collect(Collectors.toList());
+        return (BusinessAccountDto) query.getResultList().stream().map(this::mapToBusinessAccount).collect(Collectors.toList());
     }
 
     /**
