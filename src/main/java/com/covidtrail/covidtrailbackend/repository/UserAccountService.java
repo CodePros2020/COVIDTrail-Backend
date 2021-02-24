@@ -1,17 +1,13 @@
 package com.covidtrail.covidtrailbackend.repository;
 
-import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
-import com.covidtrail.covidtrailbackend.dto.UserAccountNameUpdateDto;
-import javassist.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.management.Query;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserAccountService {
@@ -19,8 +15,12 @@ public class UserAccountService {
     @PersistenceContext
     protected EntityManager manager;
 
-    @Autowired
     protected AddressService addressService;
+
+    protected PhoneService phoneService;
+
+    @Autowired
+    protected SessionInfo sessionInfo;
 
     /**
      * Get the list of all user accounts
@@ -28,23 +28,14 @@ public class UserAccountService {
      * @return list of user accounts
      */
     public List<UserAccountDto> getAllUserAccounts() {
-        String sql = "" +
-                " SELECT DISTINCT" +
-                "     ID," +
-                "     FIRSTNAME," +
-                "     MIDDLENAME," +
-                "     LASTNAME," +
-                "     EMAIL," +
-                "     PHONE," +
-                "     ADDRESS_ID" +
-                " FROM USERACCOUNT" +
-                " WHERE DELETED = 0" +
-                " ORDER BY ID DESC";
+        String sql = "" + " SELECT DISTINCT" + "     ID," + "     FIRSTNAME," + "     MIDDLENAME," + "     LASTNAME,"
+                + "     EMAIL," + "     PHONE," + "     ADDRESS_ID" + " FROM USERACCOUNT" + " WHERE DELETED = 0"
+                + " ORDER BY ID DESC";
 
         Query query = manager.createNativeQuery(sql);
 
-        return (List<UserAccountDto>) query.getResultList().stream()
-                .map(this::mapToUserAccountDto).collect(Collectors.toList());
+        return (List<UserAccountDto>) query.getResultList().stream().map(this::mapToUserAccountDto)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -53,19 +44,9 @@ public class UserAccountService {
      * @return user account
      */
     public UserAccountDto getUserAccountById(int id) {
-        String sql = "" +
-                " SELECT DISTINCT " +
-                "     ID," +
-                "     FIRSTNAME," +
-                "     MIDDLENAME," +
-                "     LASTNAME," +
-                "     EMAIL," +
-                "     PHONE," +
-                "     ADDRESS_ID" +
-                " FROM USERACCOUNT" +
-                " WHERE ID = :id" +
-                "     AND DELETED = 0" +
-                " ORDER BY ID DESC";
+        String sql = "" + " SELECT DISTINCT " + "     ID," + "     FIRSTNAME," + "     MIDDLENAME," + "     LASTNAME,"
+                + "     EMAIL," + "     PHONE," + "     ADDRESS_ID" + " FROM USERACCOUNT" + " WHERE ID = :id"
+                + "     AND DELETED = 0" + " ORDER BY ID DESC";
 
         Query query = manager.createNativeQuery(sql);
 
@@ -94,14 +75,9 @@ public class UserAccountService {
             throw new NotFoundException("User account not found with the id " + id);
         }
 
-        String sql = "" +
-                " UPDATE USERACCOUNT" +
-                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
-                "     FIRSTNAME = :fName," +
-                "     MIDDLENAME = :mName," +
-                "     LASTNAME = :lName" +
-                " WHERE ID = :id" +
-                "     AND DELETED = 0";
+        String sql = "" + " UPDATE USERACCOUNT" + " SET LAST_MODIFIED_DATETIME = GETDATE(),"
+                + "     FIRSTNAME = :fName," + "     MIDDLENAME = :mName," + "     LASTNAME = :lName"
+                + " WHERE ID = :id" + "     AND DELETED = 0";
 
         Query query = manager.createNativeQuery(sql);
 
@@ -112,14 +88,14 @@ public class UserAccountService {
 
         query.executeUpdate();
 
-        return String.format("User %d's name has been updated to '%s, %s %s'.", id,
-                request.getLastName(), request.getFirstName(), request.getMiddleName());
+        return String.format("User %d's name has been updated to '%s, %s %s'.", id, request.getLastName(),
+                request.getFirstName(), request.getMiddleName());
     }
 
     /**
      * Update user's email address by id
      *
-     * @param id      - user account id
+     * @param id       - user account id
      * @param newEmail - new email address
      * @return string message
      * @throws Exception when id not found or user account not found
@@ -136,12 +112,8 @@ public class UserAccountService {
             throw new NotFoundException("User account not found with the id " + id);
         }
 
-        String sql = "" +
-                " UPDATE USERACCOUNT" +
-                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
-                "     EMAIL = :newEmail" +
-                " WHERE ID = :id" +
-                "     AND DELETED = 0";
+        String sql = "" + " UPDATE USERACCOUNT" + " SET LAST_MODIFIED_DATETIME = GETDATE()," + "     EMAIL = :newEmail"
+                + " WHERE ID = :id" + "     AND DELETED = 0";
 
         Query query = manager.createNativeQuery(sql);
 
@@ -156,15 +128,18 @@ public class UserAccountService {
     /**
      * Update user's phone number by id
      *
-     * @param id      - user account id
+     * @param id       - user account id
      * @param newPhone - new phone number
      * @return string message
      * @throws Exception when id not found or user account not found
      */
     @Transactional
-    public String updateUserPhoneById(int id, String newPhone) throws Exception {
-        if (id == 0) {
-            throw new NotFoundException("Id is required");
+    public String updateUserPhoneById(int id, String newPhone, String password) throws Exception {
+
+        boolean isDuplicated = phoneService.findDuplicatedPhones(newPhone);
+
+        if (isDuplicated) {
+            throw new IllegalArgumentException("The phone number already exists.");
         }
 
         UserAccountDto userAccount = getUserAccountById(id);
@@ -173,16 +148,22 @@ public class UserAccountService {
             throw new NotFoundException("User account not found with the id " + id);
         }
 
-        String sql = "" +
-                " UPDATE USERACCOUNT" +
-                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
-                "     PHONE = :newPhone" +
-                " WHERE ID = :id" +
-                "     AND DELETED = 0";
+        String encryptedPasswordDb = sessionInfo.getCurrentUser().getPassword();
+        Boolean isCorrectPassword = new BCryptPasswordEncoder().matches(password, encryptedPasswordDb);
+
+        if (!isCorrectPassword) {
+            throw new IllegalArgumentException("Please provide a valid password.");
+        }
+
+        String token = TokenUtil.generateBy(newPhone, password);
+
+        String sql = "" + " UPDATE USERACCOUNT" + " SET LAST_MODIFIED_DATETIME = GETDATE(),"
+                + "     PHONE = :newPhone, TOKEN = :token" + " WHERE ID = :id" + "     AND DELETED = 0";
 
         Query query = manager.createNativeQuery(sql);
 
         query.setParameter("newPhone", newPhone);
+        query.setParameter("token", token);
         query.setParameter("id", id);
 
         query.executeUpdate();
@@ -209,21 +190,88 @@ public class UserAccountService {
             throw new NotFoundException("User account not found with the id " + id);
         }
 
-        String sql = "" +
-                " UPDATE USERACCOUNT" +
-                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
-                "     DELETED_DATETIME = GETDATE()," +
-                "     DELETED = 1" +
-                " WHERE ID = :id" +
-                "     AND DELETED = 0";
+        String sql = "" + " UPDATE USERACCOUNT" + " SET LAST_MODIFIED_DATETIME = GETDATE(),"
+                + "     DELETED_DATETIME = GETDATE()," + "     DELETED = 1" + " WHERE ID = :id"
+                + "     AND DELETED = 0";
 
         Query query = manager.createNativeQuery(sql);
-
         query.setParameter("id", id);
+        query.executeUpdate();
+
+        AddressDto address = userAccount.getAddress();
+
+        if (address != null) {
+
+            String sqlAddress = "" + " UPDATE ADDRESS"
+                    + " SET LAST_MODIFIED_DATETIME = GETDATE(), DELETED_DATETIME = GETDATE(), DELETED = 1"
+                    + " WHERE ID = :idAddress AND DELETED = 0";
+
+            query = manager.createNativeQuery(sqlAddress);
+            query.setParameter("idAddress", address.getId());
+            query.executeUpdate();
+        }
+
+        return String.format("User %s %s with id %d deleted successfully.", userAccount.getFirstName(),
+                userAccount.getLastName(), id);
+    }
+
+    /**
+     * Create user account
+     *
+     * @param dto - UserAccountCreateDto
+     * @return string message
+     */
+    @Transactional
+    public String createUserAccount(UserAccountCreateDto dto) {
+        boolean isDuplicated = phoneService.findDuplicatedPhones(dto.getPhone());
+
+        if (isDuplicated) {
+            throw new IllegalArgumentException("The phone number already exists.");
+        }
+
+        AddressCreateDto addressDto = dto.getAddress();
+
+        StringBuilder sqlAddress = new StringBuilder();
+        sqlAddress.append(
+                "INSERT into ADDRESS(CREATED_DATETIME, DELETED, ADDRESS_LINE_ONE, ADDRESS_LINE_TWO, CITY, PROVINCE, POSTAL_CODE) \n");
+        sqlAddress.append(" OUTPUT Inserted.ID \n");
+        sqlAddress.append(" VALUES (GETDATE(), 0, :addressLineOne, :addressLineTwo, :city, :province, :postalCode)");
+
+        Query query = manager.createNativeQuery(sqlAddress.toString());
+
+        query.setParameter("addressLineOne", addressDto.getAddressLineOne());
+        query.setParameter("addressLineTwo", addressDto.getAddressLineTwo());
+        query.setParameter("city", addressDto.getCity());
+        query.setParameter("province", addressDto.getProvince());
+        query.setParameter("postalCode", addressDto.getPostalCode());
+
+        Integer lastAddressId = (Integer) query.getSingleResult();
+        System.out.println(lastAddressId);
+
+        StringBuilder sqlUserAccount = new StringBuilder();
+        sqlUserAccount.append(
+                "INSERT into USERACCOUNT(CREATED_DATETIME, DELETED, FIRSTNAME, MIDDLENAME, LASTNAME, ADDRESS_ID, EMAIL, PHONE, PASSWORD, TOKEN) \n");
+        sqlUserAccount.append(
+                " VALUES (GETDATE(), 0, :firstName, :middleName, :lastName, :addressId, :email, :phone, :password, :token) ");
+
+        query = manager.createNativeQuery(sqlUserAccount.toString());
+
+        query.setParameter("firstName", dto.getFirstName());
+        query.setParameter("middleName", dto.getMiddleName());
+        query.setParameter("lastName", dto.getLastName());
+        query.setParameter("addressId", lastAddressId);
+        query.setParameter("email", dto.getEmail());
+
+        String phone = dto.getPhone();
+        String password = dto.getPassword();
+
+        query.setParameter("phone", phone);
+        query.setParameter("password", new BCryptPasswordEncoder().encode(password));
+        query.setParameter("token", TokenUtil.generateBy(phone, password));
 
         query.executeUpdate();
 
-        return String.format("User %s %s with id %d deleted successfully.", userAccount.getFirstName(), userAccount.getLastName(), id);
+        return String.format("User %s was inserted successfully.", dto.getFirstName());
     }
 
     /**
@@ -246,4 +294,5 @@ public class UserAccountService {
 
         return userAccount;
     }
+
 }

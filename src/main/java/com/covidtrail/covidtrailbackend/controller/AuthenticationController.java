@@ -1,32 +1,41 @@
 package com.covidtrail.covidtrailbackend.controller;
 
-import com.covidtrail.covidtrailbackend.dto.LoginDto;
-import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogDto;
+import com.covidtrail.covidtrailbackend.dto.AccountDetailsDto;
 import com.covidtrail.covidtrailbackend.repository.AuthenticationService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/authentication")
 @Api(tags = { "Authentication" })
 public class AuthenticationController {
-    @Autowired
-    protected AuthenticationService authenticationService;
+	@Autowired
+	protected AuthenticationService authenticationService;
 
-    @PostMapping()
-    @ApiOperation(value = "Log in.")
+	@GetMapping("/success")
+    @ApiOperation(value = "Logged in the user successfully.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public PlacesVisitedLogDto login(@RequestBody LoginDto loginDto) throws Exception {
-        // TODO
-        return null;
+    public AccountDetailsDto success() throws Exception {
+        return authenticationService.getLoggedInUserDetails();
     }
+	
+	@GetMapping("/logoutSuccess")
+	@ApiOperation(value = "Logged in the user successfully.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 500, message = "Unexpected error")})
+	public String logout() throws Exception {
+		return "You have been logged out successfully.";
+	}
+	
 }

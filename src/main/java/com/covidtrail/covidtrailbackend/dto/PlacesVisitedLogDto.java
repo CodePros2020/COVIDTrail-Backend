@@ -1,17 +1,16 @@
 package com.covidtrail.covidtrailbackend.dto;
 
-import lombok.Getter;
+import jdk.nashorn.internal.objects.annotations.Getter;
+import jdk.nashorn.internal.objects.annotations.Setter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.Date;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class PlacesVisitedLogDto {
     private int id;
-    private Date visitedDateTime;
+    private String visitedDate;
+    private String visitedDateTime;
     private UserAccountDto userAccount;
     private BusinessAccountDto businessAccount;
 }

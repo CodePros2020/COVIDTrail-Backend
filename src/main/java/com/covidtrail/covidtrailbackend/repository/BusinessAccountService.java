@@ -1,17 +1,17 @@
 package com.covidtrail.covidtrailbackend.repository;
 
-import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
-import com.covidtrail.covidtrailbackend.dto.UserAccountDto;
-import com.covidtrail.covidtrailbackend.dto.UserAccountNameUpdateDto;
-import javassist.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.management.Query;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+
+import com.covidtrail.covidtrailbackend.dto.BusinessAccountDto;
+import com.covidtrail.covidtrailbackend.model.PhoneService;
+import com.covidtrail.covidtrailbackend.utils.TokenUtil;
+
+import javassist.NotFoundException;
 
 @Service
 public class BusinessAccountService {
@@ -21,27 +21,25 @@ public class BusinessAccountService {
     @Autowired
     protected AddressService addressService;
 
+    @Autowired
+    protected PhoneService phoneService;
+
+    @Autowired
+    protected SessionInfo sessionInfo;
+
     /**
      * Get the list of all business accounts
      *
      * @return list of business account
      */
     public List<BusinessAccountDto> getAllBusinessAccounts() {
-        String sql = "" +
-                " SELECT DISTINCT" +
-                "     ID," +
-                "     BUSINESSNAME," +
-                "     EMAIL," +
-                "     PHONE," +
-                "     ADDRESS_ID" +
-                " FROM BUSINESSACCOUNT" +
-                " WHERE DELETED = 0" +
-                " ORDER BY ID DESC";
+        String sql = "" + " SELECT DISTINCT" + "     ID," + "     BUSINESSNAME," + "     EMAIL," + "     PHONE,"
+                + "     ADDRESS_ID" + " FROM BUSINESSACCOUNT" + " WHERE DELETED = 0" + " ORDER BY ID DESC";
 
         Query query = manager.createNativeQuery(sql);
 
-        return (List<BusinessAccountDto>) query.getResultList().stream()
-                .map(this::mapToBusinessAccount).collect(Collectors.toList());
+        return (List<BusinessAccountDto>) query.getResultList().stream().map(this::mapToBusinessAccount)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -50,23 +48,15 @@ public class BusinessAccountService {
      * @return business account
      */
     public BusinessAccountDto getBusinessAccountById(int id) {
-        String sql = "" +
-                " SELECT DISTINCT" +
-                "     ID," +
-                "     BUSINESSNAME," +
-                "     EMAIL," +
-                "     PHONE," +
-                "     ADDRESS_ID" +
-                " FROM BUSINESSACCOUNT" +
-                " WHERE ID = :id" +
-                "     AND DELETED = 0" +
-                " ORDER BY ID DESC";
+        String sql = "" + " SELECT DISTINCT" + "     ID," + "     BUSINESSNAME," + "     EMAIL," + "     PHONE,"
+                + "     ADDRESS_ID" + " FROM BUSINESSACCOUNT" + " WHERE ID = :id" + "     AND DELETED = 0"
+                + " ORDER BY ID DESC";
 
         Query query = manager.createNativeQuery(sql);
 
         query.setParameter("id", id);
 
-        return (BusinessAccountDto) query.getResultList().stream().map(this::mapToBusinessAccount).collect(Collectors.toList());
+        return mapToBusinessAccount(query.getSingleResult());
     }
 
     /**
@@ -89,12 +79,8 @@ public class BusinessAccountService {
             throw new NotFoundException("Business account not found with the id " + id);
         }
 
-        String sql = "" +
-                " UPDATE BUSINESSACCOUNT" +
-                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
-                "     BUSINESSNAME = :name" +
-                " WHERE ID = :id" +
-                "     AND DELETED = 0";
+        String sql = "" + " UPDATE BUSINESSACCOUNT" + " SET LAST_MODIFIED_DATETIME = GETDATE(),"
+                + "     BUSINESSNAME = :name" + " WHERE ID = :id" + "     AND DELETED = 0";
 
         Query query = manager.createNativeQuery(sql);
 
@@ -109,7 +95,7 @@ public class BusinessAccountService {
     /**
      * Update business email address by id
      *
-     * @param id      - business account id
+     * @param id       - business account id
      * @param newEmail - new email address
      * @return string message
      * @throws Exception when id not found or business account not found
@@ -126,12 +112,8 @@ public class BusinessAccountService {
             throw new NotFoundException("Business account not found with the id " + id);
         }
 
-        String sql = "" +
-                " UPDATE BUSINESSACCOUNT" +
-                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
-                "     EMAIL = :newEmail" +
-                " WHERE ID = :id" +
-                "     AND DELETED = 0";
+        String sql = "" + " UPDATE BUSINESSACCOUNT" + " SET LAST_MODIFIED_DATETIME = GETDATE(),"
+                + "     EMAIL = :newEmail" + " WHERE ID = :id" + "     AND DELETED = 0";
 
         Query query = manager.createNativeQuery(sql);
 
@@ -146,15 +128,18 @@ public class BusinessAccountService {
     /**
      * Update business' phone number by id
      *
-     * @param id      - business account id
+     * @param id       - business account id
      * @param newPhone - new phone number
      * @return string message
      * @throws Exception when id not found or business account not found
      */
     @Transactional
-    public String updateBusinessPhoneById(int id, String newPhone) throws Exception {
-        if (id == 0) {
-            throw new NotFoundException("Id is required");
+    public String updateBusinessPhoneById(int id, String newPhone, String password) throws Exception {
+
+        boolean isDuplicated = phoneService.findDuplicatedPhones(newPhone);
+
+        if (isDuplicated) {
+            throw new IllegalArgumentException("The phone number already exists.");
         }
 
         BusinessAccountDto businessAccountDto = getBusinessAccountById(id);
@@ -163,16 +148,22 @@ public class BusinessAccountService {
             throw new NotFoundException("Business account not found with the id " + id);
         }
 
-        String sql = "" +
-                " UPDATE BUSINESSACCOUNT" +
-                " SET LAST_MODIFIED_DATETIME = GETDATE()," +
-                "     PHONE = :newPhone" +
-                " WHERE ID = :id" +
-                "     AND DELETED = 0";
+        String encryptedPasswordDb = sessionInfo.getCurrentUser().getPassword();
+        Boolean isCorrectPassword = new BCryptPasswordEncoder().matches(password, encryptedPasswordDb);
+
+        if (!isCorrectPassword) {
+            throw new IllegalArgumentException("Please provide a valid password.");
+        }
+
+        String token = TokenUtil.generateBy(newPhone, password);
+
+        String sql = "" + " UPDATE BUSINESSACCOUNT" + " SET LAST_MODIFIED_DATETIME = GETDATE(),"
+                + "     PHONE = :newPhone, TOKEN = :token" + " WHERE ID = :id" + "     AND DELETED = 0";
 
         Query query = manager.createNativeQuery(sql);
 
         query.setParameter("newPhone", newPhone);
+        query.setParameter("token", token);
         query.setParameter("id", id);
 
         query.executeUpdate();
@@ -199,18 +190,85 @@ public class BusinessAccountService {
             throw new NotFoundException("Business account not found with the id " + id);
         }
 
-        String sql = "" +
-                " UPDATE BUSINESSACCOUNT" +
-                " SET LAST_MODIFIED_DATETIME = GETDATE(), DELETED_DATETIME = GETDATE(), DELETED = 1" +
-                " WHERE ID = :id AND DELETED = 0";
+        String sql = "" + " UPDATE BUSINESSACCOUNT"
+                + " SET LAST_MODIFIED_DATETIME = GETDATE(), DELETED_DATETIME = GETDATE(), DELETED = 1"
+                + " WHERE ID = :id AND DELETED = 0";
 
         Query query = manager.createNativeQuery(sql);
-
         query.setParameter("id", id);
+        query.executeUpdate();
+
+        AddressDto address = businessAccount.getAddress();
+
+        if (address != null) {
+
+            String sqlAddress = "" + " UPDATE ADDRESS"
+                    + " SET LAST_MODIFIED_DATETIME = GETDATE(), DELETED_DATETIME = GETDATE(), DELETED = 1"
+                    + " WHERE ID = :idAddress AND DELETED = 0";
+
+            query = manager.createNativeQuery(sqlAddress);
+            query.setParameter("idAddress", address.getId());
+            query.executeUpdate();
+        }
+
+        return String.format("Business %s with id %d deleted successfully.", businessAccount.getBusinessName(), id);
+    }
+
+    /**
+     * Create Business Account
+     *
+     * @param dto - BusinessAccountCreateDto
+     * @return - string message
+     */
+    @Transactional
+    public String createBusinessAccount(BusinessAccountCreateDto dto) {
+
+        boolean isDuplicated = phoneService.findDuplicatedPhones(dto.getPhone());
+
+        if (isDuplicated) {
+            throw new IllegalArgumentException("The phone number already exists.");
+        }
+
+        AddressCreateDto addressDto = dto.getAddress();
+
+        StringBuilder sqlAddress = new StringBuilder();
+        sqlAddress.append(
+                "INSERT into ADDRESS(CREATED_DATETIME, DELETED, ADDRESS_LINE_ONE, ADDRESS_LINE_TWO, CITY, PROVINCE, POSTAL_CODE) \n");
+        sqlAddress.append(" OUTPUT Inserted.ID \n");
+        sqlAddress.append(" VALUES (GETDATE(), 0, :addressLineOne, :addressLineTwo, :city, :province, :postalCode)");
+
+        Query query = manager.createNativeQuery(sqlAddress.toString());
+
+        query.setParameter("addressLineOne", addressDto.getAddressLineOne());
+        query.setParameter("addressLineTwo", addressDto.getAddressLineTwo());
+        query.setParameter("city", addressDto.getCity());
+        query.setParameter("province", addressDto.getProvince());
+        query.setParameter("postalCode", addressDto.getPostalCode());
+
+        Integer lastAddressId = (Integer) query.getSingleResult();
+        System.out.println(lastAddressId);
+
+        StringBuilder sqlUserAccount = new StringBuilder();
+        sqlUserAccount.append(
+                "INSERT into BUSINESSACCOUNT(CREATED_DATETIME, DELETED, BUSINESSNAME, ADDRESS_ID, EMAIL, PHONE, PASSWORD, TOKEN) \n");
+        sqlUserAccount.append(" VALUES (GETDATE(), 0, :businessName, :addressId, :email, :phone, :password, :token) ");
+
+        query = manager.createNativeQuery(sqlUserAccount.toString());
+
+        query.setParameter("businessName", dto.getBusinessName());
+        query.setParameter("addressId", lastAddressId);
+        query.setParameter("email", dto.getEmail());
+
+        String phone = dto.getPhone();
+        String password = dto.getPassword();
+
+        query.setParameter("phone", phone);
+        query.setParameter("password", new BCryptPasswordEncoder().encode(password));
+        query.setParameter("token", TokenUtil.generateBy(phone, password));
 
         query.executeUpdate();
 
-        return String.format("Business %s with id %d deleted successfully.", businessAccount.getBusinessName(), id);
+        return String.format("User %s was inserted successfully.", dto.getBusinessName());
     }
 
     /**

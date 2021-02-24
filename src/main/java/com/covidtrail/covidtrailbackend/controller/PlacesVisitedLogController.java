@@ -1,15 +1,19 @@
 package com.covidtrail.covidtrailbackend.controller;
 
+import java.util.List;
+
+import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogBusinessDto;
 import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogDto;
+import com.covidtrail.covidtrailbackend.dto.PlacesVisitedLogUserDto;
 import com.covidtrail.covidtrailbackend.repository.PlacesVisitedLogService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/placesVisitedLog")
@@ -36,21 +40,21 @@ public class PlacesVisitedLogController {
         return placesVisitedLogService.getPlacesVisitedLogById(id);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/{userId}/user")
     @ApiOperation(value = "Get an places visited log by user id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public List<PlacesVisitedLogDto> getPlacesVisitedLogsByUserId(@PathVariable int userId) {
+    public List<PlacesVisitedLogBusinessDto> getPlacesVisitedLogsByUserId(@PathVariable int userId) {
         return placesVisitedLogService.getPlacesVisitedLogsByUserId(userId);
     }
 
-    @GetMapping("/{businessId}")
+    @GetMapping("/{businessId}/business")
     @ApiOperation(value = "Get an places visited log by business id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Unexpected error")})
-    public List<PlacesVisitedLogDto> getPlacesVisitedLogsByBusinessId(@PathVariable int businessId) {
+    public List<PlacesVisitedLogUserDto> getPlacesVisitedLogsByBusinessId(@PathVariable int businessId) {
         return placesVisitedLogService.getPlacesVisitedLogsByBusinessId(businessId);
     }
 
